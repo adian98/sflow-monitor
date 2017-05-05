@@ -77,7 +77,7 @@ public class HostCpuInfo extends CounterRecord {
 
     static public String schema() {
         return "CREATE TABLE host_cpu (" +
-                "ip TEXT NOT NULL, " +
+                "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
                 "cpu_load_one REAL, " +
                 "cpu_load_five REAL, " +
@@ -96,8 +96,8 @@ public class HostCpuInfo extends CounterRecord {
                 "cpu_sintr INTEGER, " +
                 "cpu_interrupts INTEGER, " +
                 "cpu_contexts INTEGER, " +
-                "PRIMARY KEY(ip, timestamp)," +
-                "FOREIGN KEY(ip) REFERENCES host_description(ip) );";
+                "PRIMARY KEY(host_ip, timestamp)," +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
 
 }

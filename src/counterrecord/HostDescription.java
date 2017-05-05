@@ -153,13 +153,13 @@ public class HostDescription extends CounterRecord {
 
     static public String schema() {
         return "CREATE TABLE host_description (" +
-                "ip TEXT NOT NULL, " +
+                "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
                 "hostname TEXT, " +
                 "uuid TEXT, " +
                 "machine_type TEXT, " +
                 "os_name TEXT, " +
                 "os_release TEXT, " +
-                "PRIMARY KEY(ip, timestamp) );";
+                "PRIMARY KEY(host_ip, timestamp) );";
     }
 }

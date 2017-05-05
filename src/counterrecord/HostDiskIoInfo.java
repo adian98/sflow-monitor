@@ -50,7 +50,7 @@ public class HostDiskIoInfo extends CounterRecord {
 
     static public String schema() {
         return "CREATE TABLE host_disk_io (" +
-                "ip TEXT NOT NULL, " +
+                "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
                 "disk_total INTEGER, " +
                 "disk_free INTEGER, "  +
@@ -61,7 +61,7 @@ public class HostDiskIoInfo extends CounterRecord {
                 "writes INTEGER, "  +
                 "bytes_written INTEGER, "  +
                 "write_time INTEGER, "  +
-                "PRIMARY KEY(ip, timestamp)," +
-                "FOREIGN KEY(ip) REFERENCES host_description(ip) );";
+                "PRIMARY KEY(host_ip, timestamp)," +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
 }
