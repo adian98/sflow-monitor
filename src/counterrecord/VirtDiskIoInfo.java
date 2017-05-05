@@ -1,6 +1,8 @@
 package counterrecord;
 import config.Config;
 
+import java.util.HashMap;
+
 
 public class VirtDiskIoInfo extends CounterRecord {
     private long vdsk_capacity;     /* logical size in bytes */
@@ -12,8 +14,8 @@ public class VirtDiskIoInfo extends CounterRecord {
     private long vdsk_wr_bytes;     /* number of  written bytes */
     private long vdsk_errs;         /* read/write errors */
 
-    public VirtDiskIoInfo(byte[] bytes) {
-        super(bytes);
+    public VirtDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
+        super(bytes, sourceIP, timestamp);
     }
 
     @Override
@@ -26,7 +28,19 @@ public class VirtDiskIoInfo extends CounterRecord {
         vdsk_wr_req = Utils.bufferGetUint32(buffer);
         vdsk_wr_bytes = buffer.getLong();
         vdsk_errs = Utils.bufferGetUint32(buffer);
+    }
 
-
+    @Override
+    protected HashMap<String, Object> getMap() {
+        HashMap<String, Object> map = super.getMap();
+        map.put("vdsk_capacity", vdsk_capacity);
+        map.put("vdsk_allocation", vdsk_allocation);
+        map.put("vdsk_available", vdsk_available);
+        map.put("vdsk_rd_req", vdsk_rd_req);
+        map.put("vdsk_rd_bytes", vdsk_rd_bytes);
+        map.put("vdsk_wr_req", vdsk_wr_req);
+        map.put("vdsk_wr_bytes", vdsk_wr_bytes);
+        map.put("vdsk_errs", vdsk_errs);
+        return map;
     }
 }

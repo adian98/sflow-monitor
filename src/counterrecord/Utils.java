@@ -34,9 +34,9 @@ public class Utils {
     public static long bufferGetUint32(ByteBuffer buffer) {
         //java 没有 uint32_t ,用 long 储存
         ByteBuffer buf= ByteBuffer.allocate(8);
-        buffer.putInt(0);
+        buf.putInt(0);
         buf.putInt(buffer.getInt());
         buf.flip();
-        return buffer.getLong();
+        return buf.getLong();
     }
 }

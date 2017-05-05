@@ -2,17 +2,18 @@ package counterrecord;
 import config.Config;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 
 public class HostDescription extends CounterRecord {
-    private String hostname;    /* hostname, empty if unknown */
-    private String uuid;        /* 16 bytes binary UUID, empty if unknown */
+    private String hostname;     /* hostname, empty if unknown */
+    private String uuid;         /* 16 bytes binary UUID, empty if unknown */
     private String machine_type; /* the processor family */
     private String os_name;      /* Operating system */
     private String os_release;   /* e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown */
 
-    public HostDescription(byte[] bytes) {
-        super(bytes);
+    public HostDescription(byte[] bytes, String sourceIP, long timestamp) {
+        super(bytes, sourceIP, timestamp);
     }
 
 
@@ -139,5 +140,26 @@ public class HostDescription extends CounterRecord {
         }
     }
 
+    @Override
+    protected HashMap<String, Object> getMap() {
+        HashMap<String, Object> map = super.getMap();
+        map.put("hostname", hostname);
+        map.put("uuid", uuid);
+        map.put("machine_type", machine_type);
+        map.put("os_name", os_name);
+        map.put("os_release", os_release);
+        return map;
+    }
 
+    static public String schema() {
+        return "CREATE TABLE host_description (" +
+                "ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "hostname TEXT, " +
+                "uuid TEXT, " +
+                "machine_type TEXT, " +
+                "os_name TEXT, " +
+                "os_release TEXT, " +
+                "PRIMARY KEY(ip, timestamp) );";
+    }
 }

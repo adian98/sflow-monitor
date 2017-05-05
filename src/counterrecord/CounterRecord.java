@@ -1,5 +1,8 @@
 package counterrecord;
+import net.sf.json.JSONObject;
+
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 
 public class CounterRecord {
@@ -17,7 +20,17 @@ public class CounterRecord {
         throw new Exception("not implement");
     }
 
+    protected HashMap<String, Object> getMap() {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("host_ip", source_ip);
+        map.put("timestamp", timestamp);
+        return map;
+    }
 
-
+    @Override
+    public String toString() {
+        JSONObject jsonObject = JSONObject.fromObject(getMap());
+        return jsonObject.toString(2);
+    }
 
 }

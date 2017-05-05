@@ -2,6 +2,8 @@ package counterrecord;
 
 import config.Config;
 
+import java.util.HashMap;
+
 /**
  * Created by cloud on 17-5-3.
  */
@@ -16,10 +18,9 @@ public class VirtNetIoInfo extends CounterRecord {
     private long vnio_errs_out;    /* total transmit errors */
     private long vnio_drops_out;   /* total transmit drops */
 
-    public VirtNetIoInfo(byte[] bytes) {
-        super(bytes);
+    public VirtNetIoInfo(byte[] bytes, String sourceIP, long timestamp) {
+        super(bytes, sourceIP, timestamp);
     }
-
 
     @Override
     public void decode() throws Exception {
@@ -32,5 +33,20 @@ public class VirtNetIoInfo extends CounterRecord {
         vnio_packets_out = Utils.bufferGetUint32(buffer);
         vnio_errs_out = Utils.bufferGetUint32(buffer);
         vnio_drops_out = Utils.bufferGetUint32(buffer);
+    }
+
+
+    @Override
+    protected HashMap<String, Object> getMap() {
+        HashMap<String, Object> map = super.getMap();
+        map.put("vnio_bytes_in", vnio_bytes_in);
+        map.put("vnio_packets_in", vnio_packets_in);
+        map.put("vnio_errs_in", vnio_errs_in);
+        map.put("vnio_drops_in", vnio_drops_in);
+        map.put("vnio_bytes_out", vnio_bytes_out);
+        map.put("vnio_packets_out", vnio_packets_out);
+        map.put("vnio_errs_out", vnio_errs_out);
+        map.put("vnio_drops_out", vnio_drops_out);
+        return map;
     }
 }

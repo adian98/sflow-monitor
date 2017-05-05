@@ -52,7 +52,7 @@ public class SFlowDatagram {
         buffer.getInt();
 
         //switch uptime in ms, ignore
-        timestamp = buffer.getInt();
+        buffer.getInt();
 
         //Config.LOG_INFO("uptime = %s", timestamp);
 
@@ -106,11 +106,11 @@ public class SFlowDatagram {
             SFlowSample sample = null;
             switch (sampleType) {
                 case COUNTERS_SAMPLE_TYPE: {
-                    sample = new CounterSample(bytes, false);
+                    sample = new CounterSample(bytes, sourceIP, timestamp, false);
                     break;
                 }
                 case COUNTERS_SAMPLE_EXPANDED_TYPE: {
-                    sample = new CounterSample(bytes, true);
+                    sample = new CounterSample(bytes, sourceIP, timestamp,true);
                     break;
                 }
                 case FLOW_SAMPLE_TYPE:

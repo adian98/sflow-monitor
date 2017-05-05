@@ -5,7 +5,7 @@ import counterrecord.VirtNodeInfo;
 import java.nio.ByteBuffer;
 import counterrecord.*;
 
-public class CounterSample implements SFlowSample{
+public class CounterSample implements SFlowSample {
     private static final int HOST_DESCRIPTION_TYPE = 0X0 | 2000;
     private static final int HOST_ADAPTERS_TYPE = 0X0 | 2001;
     private static final int HOST_PARENT_TYPE = 0X0 | 2002;
@@ -19,16 +19,19 @@ public class CounterSample implements SFlowSample{
     private static final int VIRT_DISK_IO_TYPE = 0X0 | 2103;
     private static final int VIRT_NET_IO_TYPE = 0X0 | 2104;
 
-
     private ByteBuffer buffer;
     private boolean isExpanded;
     private int idType;
     private int idIndex;
     private int records;
+    private String sourceIp;
+    private long timestamp;
 
-    public CounterSample(byte[] bytes, boolean isExpanded) {
+    public CounterSample(byte[] bytes, String sourceIp, long timestamp, boolean isExpanded) {
         this.buffer = ByteBuffer.wrap(bytes);
         this.isExpanded = isExpanded;
+        this.sourceIp = sourceIp;
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -64,38 +67,38 @@ public class CounterSample implements SFlowSample{
 
             switch (enterprise | format) {
                 case HOST_DESCRIPTION_TYPE:
-                    record = new HostDescription(bytes);
+                    record = new HostDescription(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_NODE_TYPE:
-                    record = new VirtNodeInfo(bytes);
+                    record = new VirtNodeInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_CPU_TYPE:
-                    record = new VirtCpuInfo(bytes);
+                    record = new VirtCpuInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_MEMORY_TYPE:
-                    record = new VirtMemoryInfo(bytes);
+                    record = new VirtMemoryInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_DISK_IO_TYPE:
-                    record = new VirtDiskIoInfo(bytes);
+                    record = new VirtDiskIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_NET_IO_TYPE:
-                    record = new VirtNetIoInfo(bytes);
+                    record = new VirtNetIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case HOST_ADAPTERS_TYPE:
                 case HOST_PARENT_TYPE:
                     /*skip*/
                     break;
                 case HOST_CPU_TYPE:
-                    record = new HostCpuInfo(bytes);
+                    record = new HostCpuInfo(bytes, sourceIp, timestamp);
                     break;
                 case HOST_MEMORY_TYPE:
-                    record = new HostMemoryInfo(bytes);
+                    record = new HostMemoryInfo(bytes, sourceIp, timestamp);
                     break;
                 case HOST_DISK_IO_TYPE:
-                    record = new HostDiskIoInfo(bytes);
+                    record = new HostDiskIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case HOST_NET_IO_TYPE:
-                    record = new HostNetIoInfo(bytes);
+                    record = new HostNetIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case 1:
                 case 1005:
@@ -115,6 +118,7 @@ public class CounterSample implements SFlowSample{
             try {
                 if (record != null) {
                     record.decode();
+                    Config.LOG_INFO(record.toString());
                 }
             } catch (Exception e) {
                 Config.LOG_ERROR(e.getMessage());
