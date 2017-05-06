@@ -159,7 +159,6 @@ public class HostDescription extends CounterRecord {
                 "uuid TEXT, " +
                 "machine_type TEXT, " +
                 "os_name TEXT, " +
-                "os_release TEXT, " +
-                "PRIMARY KEY(host_ip, timestamp) );";
+                "os_release TEXT );";
     }
 }

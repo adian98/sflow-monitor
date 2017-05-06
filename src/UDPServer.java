@@ -1,13 +1,12 @@
 import config.Config;
+import db.ConnectionPool;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
-/**
- * Created by cloud on 17-4-28.
- */
+
 public class UDPServer implements Runnable{
 
     private static int MAX_SFLOW_PKT_SIZ = 65536;
@@ -56,6 +55,8 @@ public class UDPServer implements Runnable{
     }
 
     public static void main(String[] args) throws Exception {
+        Config.getJdbcConnection();
+
         Thread thread = new Thread(new UDPServer(6343));
         thread.start();
         thread.join();

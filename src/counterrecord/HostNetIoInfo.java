@@ -44,4 +44,19 @@ public class HostNetIoInfo extends CounterRecord {
         map.put("drops_out", drops_out);
         return map;
     }
+
+    static public String schema() {
+        return "CREATE TABLE host_net (" +
+                "host_ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "bytes_in INTEGER, " +
+                "packets_in INTEGER, " +
+                "errs_in INTEGER, " +
+                "drops_in INTEGER, " +
+                "bytes_out INTEGER, " +
+                "packets_out INTEGER, " +
+                "errs_out INTEGER, " +
+                "drops_out INTEGER, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
 }

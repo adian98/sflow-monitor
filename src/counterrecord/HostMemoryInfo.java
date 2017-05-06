@@ -54,4 +54,22 @@ public class HostMemoryInfo extends CounterRecord {
         map.put("swap_out", swap_out);
         return map;
     }
+
+    static public String schema() {
+        return "CREATE TABLE host_memory (" +
+                "host_ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "mem_total INTEGER, " +
+                "mem_free INTEGER, " +
+                "mem_shared INTEGER, " +
+                "mem_buffers INTEGER, " +
+                "mem_cached  INTEGER, " +
+                "swap_total INTEGER, " +
+                "swap_free INTEGER, " +
+                "page_in INTEGER, " +
+                "page_out INTEGER, " +
+                "swap_in INTEGER, " +
+                "swap_out INTEGER, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
 }

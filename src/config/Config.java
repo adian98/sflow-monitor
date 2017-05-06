@@ -1,5 +1,8 @@
 package config;
 
+import db.ConnectionPool;
+
+import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,7 +28,7 @@ class LogFormatter extends Formatter {
 
 public class Config {
     private Logger logger = Logger.getLogger("sflow-monitor");
-
+    private ConnectionPool connectionPool = new ConnectionPool(10);
 
     //singleton
     static Config config = new Config();
@@ -51,5 +54,13 @@ public class Config {
     static public void LOG_ERROR(String format, Object ... objects) {
         String s = String.format(format, objects);
         config.logger.log(Level.SEVERE, s);
+    }
+
+    static public Connection getJdbcConnection() throws Exception {
+        return config.connectionPool.get();
+    }
+
+    static public void putJdbcConnection(Connection conn) throws Exception{
+        config.connectionPool.put(conn);
     }
 }

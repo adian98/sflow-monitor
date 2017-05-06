@@ -61,7 +61,6 @@ public class HostDiskIoInfo extends CounterRecord {
                 "writes INTEGER, "  +
                 "bytes_written INTEGER, "  +
                 "write_time INTEGER, "  +
-                "PRIMARY KEY(host_ip, timestamp)," +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
 }

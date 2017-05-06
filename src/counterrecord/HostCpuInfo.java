@@ -96,7 +96,6 @@ public class HostCpuInfo extends CounterRecord {
                 "cpu_sintr INTEGER, " +
                 "cpu_interrupts INTEGER, " +
                 "cpu_contexts INTEGER, " +
-                "PRIMARY KEY(host_ip, timestamp)," +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
 

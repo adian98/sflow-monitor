@@ -42,7 +42,8 @@ public class ConnectionPool {
             stmt.execute(HostDescription.schema());
             stmt.execute(HostCpuInfo.schema());
             stmt.execute(HostDiskIoInfo.schema());
-
+            stmt.execute(HostMemoryInfo.schema());
+            stmt.execute(HostNetIoInfo.schema());
         }
         return conn;
     }
