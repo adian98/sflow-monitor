@@ -53,7 +53,11 @@ public class UDPServer implements Runnable{
 
         }
 
+    }
 
-
+    public static void main(String[] args) throws Exception {
+        Thread thread = new Thread(new UDPServer(6343));
+        thread.start();
+        thread.join();
     }
 }
