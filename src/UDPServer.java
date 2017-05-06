@@ -55,8 +55,6 @@ public class UDPServer implements Runnable{
     }
 
     public static void main(String[] args) throws Exception {
-        Config.getJdbcConnection();
-
         Thread thread = new Thread(new UDPServer(6343));
         thread.start();
         thread.join();

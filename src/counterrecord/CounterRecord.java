@@ -2,6 +2,7 @@ package counterrecord;
 import net.sf.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 
@@ -31,6 +32,10 @@ public class CounterRecord {
     public String toString() {
         JSONObject jsonObject = JSONObject.fromObject(getMap());
         return jsonObject.toString(2);
+    }
+
+    public void saveToDb() throws Exception {
+        throw new SQLException("not implement");
     }
 
 }

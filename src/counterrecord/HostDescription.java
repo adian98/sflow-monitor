@@ -2,7 +2,9 @@ package counterrecord;
 import config.Config;
 
 import java.nio.ByteBuffer;
+import java.sql.*;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class HostDescription extends CounterRecord {
@@ -11,6 +13,8 @@ public class HostDescription extends CounterRecord {
     private String machine_type; /* the processor family */
     private String os_name;      /* Operating system */
     private String os_release;   /* e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown */
+
+    static HashSet<String> nodeList = loadFromDb();
 
     public HostDescription(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
@@ -35,8 +39,8 @@ public class HostDescription extends CounterRecord {
         buffer.get(bytes);
         StringBuilder builder = new StringBuilder();
 
-        for(int i= 0; i < bytes.length; ++i) {
-            if (i < bytes.length -1) {
+        for (int i = 0; i < bytes.length; ++i) {
+            if (i < bytes.length - 1) {
                 builder.append(String.format("%2x-", bytes[i]));
             } else {
                 builder.append(String.format("%2x", bytes[i]));
@@ -70,7 +74,7 @@ public class HostDescription extends CounterRecord {
             case 6:
                 machine_type = "alpha";
                 break;
-            case 7 :
+            case 7:
                 machine_type = "powerpc";
                 break;
             case 8:
@@ -161,4 +165,77 @@ public class HostDescription extends CounterRecord {
                 "os_name TEXT, " +
                 "os_release TEXT );";
     }
+
+    static private HashSet<String> loadFromDb() {
+        HashSet<String> set = new HashSet<String>();
+        Connection conn;
+        try {
+            conn = Config.getJdbcConnection();
+            String sql = "SELECT host_ip FROM host_description";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                set.add(rs.getString("host_ip"));
+            }
+
+            Config.putJdbcConnection(conn);
+        } catch (Exception e) {
+            Config.LOG_ERROR(e.getMessage());
+        }
+
+        return set;
+    }
+
+    static public synchronized boolean contains(String host) {
+        return nodeList.contains(host);
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        if (HostDescription.contains(host_ip)) {
+            String sql = "UPDATE host_description " +
+                    "SET timestamp = ?, " +
+                    "hostname = ?, " +
+                    "uuid = ?, " +
+                    "machine_type = ?, " +
+                    "os_name = ?, " +
+                    "os_release = ? " +
+                    "WHERE host_ip = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            pstmt.setLong(1, timestamp);
+            pstmt.setString(2, hostname);
+            pstmt.setString(3, uuid);
+            pstmt.setString(4, machine_type);
+            pstmt.setString(5, os_name);
+            pstmt.setString(6, os_release);
+            pstmt.setString(7, host_ip);
+            pstmt.executeUpdate();
+
+        } else {
+            //do save
+            String sql = "INSERT INTO host_description " +
+                    "(host_ip, timestamp, hostname ,uuid, machine_type, os_name, os_release) " +
+                    "VALUES(?,?,?,?,?,?,?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, host_ip);
+            pstmt.setLong(2, timestamp);
+            pstmt.setString(3, hostname);
+            pstmt.setString(4, uuid);
+            pstmt.setString(5, machine_type);
+            pstmt.setString(6, os_name);
+            pstmt.setString(7, os_release);
+
+            pstmt.executeUpdate();
+            synchronized (nodeList) {
+                nodeList.add(host_ip);
+            }
+        }
+        Config.putJdbcConnection(conn);
+    }
+
+
 }

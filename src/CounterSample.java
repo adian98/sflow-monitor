@@ -118,6 +118,7 @@ public class CounterSample implements SFlowSample {
             try {
                 if (record != null) {
                     record.decode();
+                    record.saveToDb();
                     Config.LOG_INFO(record.toString());
                 }
             } catch (Exception e) {

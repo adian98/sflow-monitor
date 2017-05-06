@@ -16,6 +16,10 @@ public class ConnectionPool {
     }
 
     public synchronized Connection get() throws Exception {
+        if (connections.size() > maxSize) {
+            throw new Exception("db connections too large");
+        }
+
         if (connections.isEmpty()) {
             return ConnectionPool.newConnection("jdbc:sqlite:/tmp/db.db");
         } else {
