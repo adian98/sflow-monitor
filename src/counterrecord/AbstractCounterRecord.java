@@ -5,6 +5,7 @@ import net.sf.json.JSONObject;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 class AbstractCounterRecord {
@@ -23,7 +24,7 @@ class AbstractCounterRecord {
     }
 
     protected HashMap<String, Object> getMap() {
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("host_ip", host_ip);
         map.put("timestamp", timestamp);
         return map;

@@ -3,6 +3,8 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 public class HostDiskIoInfo extends HostCounterRecord {
@@ -31,7 +33,7 @@ public class HostDiskIoInfo extends HostCounterRecord {
     public void decode() throws Exception {
         disk_total = buffer.getLong();
         disk_free = buffer.getLong();
-        part_max_used = buffer.getInt() / 100;
+        part_max_used = (float) buffer.getInt() / 100;
         reads = Utils.bufferGetUint32(buffer);
         bytes_read = buffer.getLong();
         read_time = Utils.bufferGetUint32(buffer);
@@ -69,5 +71,29 @@ public class HostDiskIoInfo extends HostCounterRecord {
                 "bytes_written INTEGER, "  +
                 "write_time INTEGER, "  +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO host_disk_io " +
+                "(host_ip, timestamp, disk_total, disk_free, part_max_used, " +
+                "reads, bytes_read, read_time, writes, bytes_written, write_time) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setLong(3, disk_total);
+        pstmt.setLong(4, disk_free);
+        pstmt.setFloat(5, part_max_used);
+        pstmt.setLong(6, reads);
+        pstmt.setLong(7, bytes_read);
+        pstmt.setLong(8, read_time);
+        pstmt.setLong(9, writes);
+        pstmt.setLong(10, bytes_written);
+        pstmt.setLong(11, write_time);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
     }
 }
