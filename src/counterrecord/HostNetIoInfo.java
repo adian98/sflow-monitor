@@ -2,6 +2,8 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 public class HostNetIoInfo extends HostCounterRecord {
@@ -66,4 +68,29 @@ public class HostNetIoInfo extends HostCounterRecord {
                 "drops_out INTEGER, " +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO host_net " +
+                "(host_ip, timestamp, bytes_in, packets_in, errs_in, drops_in, " +
+                "bytes_out, packets_out, errs_out, drops_out) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setLong(3, bytes_in);
+        pstmt.setLong(4, packets_in);
+        pstmt.setLong(5, errs_in);
+        pstmt.setLong(6, drops_in);
+        pstmt.setLong(7, bytes_out);
+        pstmt.setLong(8, packets_out);
+        pstmt.setLong(9, errs_out);
+        pstmt.setLong(10, drops_out);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
+    }
+
+
 }

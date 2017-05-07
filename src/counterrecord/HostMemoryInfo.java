@@ -2,6 +2,8 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 public class HostMemoryInfo extends HostCounterRecord {
@@ -78,5 +80,31 @@ public class HostMemoryInfo extends HostCounterRecord {
                 "swap_in INTEGER, " +
                 "swap_out INTEGER, " +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO host_memory " +
+                "(host_ip, timestamp, mem_total, mem_free, mem_shared, mem_buffers, " +
+                "mem_cached, swap_total, swap_free, page_in, page_out, swap_in, swap_out) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setLong(3, mem_total);
+        pstmt.setLong(4, mem_free);
+        pstmt.setLong(5, mem_shared);
+        pstmt.setLong(6, mem_buffers);
+        pstmt.setLong(7, mem_cached);
+        pstmt.setLong(8, swap_total);
+        pstmt.setLong(9, swap_free);
+        pstmt.setLong(10, page_in);
+        pstmt.setLong(11, page_out);
+        pstmt.setLong(12, swap_in);
+        pstmt.setLong(13, swap_out);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
     }
 }
