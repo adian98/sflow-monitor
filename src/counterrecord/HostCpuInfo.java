@@ -2,6 +2,7 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
 
@@ -107,9 +108,34 @@ public class HostCpuInfo extends HostCounterRecord {
 
     @Override
     public void saveToDb() throws Exception {
-        String sql = "INSERT INTO host_description " +
-                "(host_ip, timestamp, hostname ,uuid, machine_type, os_name, os_release) " +
-                "VALUES(?,?,?,?,?,?,?)";
+        Connection conn = Config.getJdbcConnection();
 
+        String sql = "INSERT INTO host_cpu " +
+                "(host_ip, timestamp, cpu_load_one, cpu_load_five, cpu_load_fifteen, cpu_proc_run, " +
+                "cpu_proc_total, cpu_num, cpu_speed, cpu_uptime, cpu_user, cpu_nice, cpu_system, cpu_idle, " +
+                "cpu_waiting_io, cpu_intr, cpu_sintr, cpu_interrupts, cpu_contexts) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setFloat(3, cpu_load_one);
+        pstmt.setFloat(4, cpu_load_five);
+        pstmt.setFloat(5, cpu_load_fifteen);
+        pstmt.setLong(6, cpu_proc_run);
+        pstmt.setLong(7, cpu_proc_total);
+        pstmt.setLong(8, cpu_num);
+        pstmt.setLong(9, cpu_speed);
+        pstmt.setLong(10, cpu_uptime);
+        pstmt.setLong(11, cpu_user);
+        pstmt.setLong(12, cpu_nice);
+        pstmt.setLong(13, cpu_system);
+        pstmt.setLong(14, cpu_idle);
+        pstmt.setLong(15, cpu_waiting_io);
+        pstmt.setLong(16, cpu_intr);
+        pstmt.setLong(17, cpu_sintr);
+        pstmt.setLong(18, cpu_interrupts);
+        pstmt.setLong(19, cpu_contexts);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
     }
 }
