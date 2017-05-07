@@ -15,9 +15,9 @@ public class SFlowDatagram {
     private boolean is_v4;
     private ByteBuffer buffer;
     private int size;
-    private String sourceIP;
+    private String source_ip;
     private long timestamp;
-    private int datagramVersion;
+    private int version;
     private String agent_address;
     private int samples;
 
@@ -26,7 +26,7 @@ public class SFlowDatagram {
         is_v4 = socketAddress instanceof Inet4Address;
         this.buffer = buffer;
         size = buffer.remaining();
-        sourceIP = socketAddress.getHostAddress();
+        source_ip = socketAddress.getHostAddress();
         timestamp = System.currentTimeMillis();
     }
 
@@ -36,10 +36,10 @@ public class SFlowDatagram {
         //Config.LOG_INFO("source ip = %s size = %d", sourceIP, size);
 
         //java use network endian
-        datagramVersion = buffer.getInt();
+        version = buffer.getInt();
 
-        if (datagramVersion != 5) {
-            Config.LOG_ERROR("not supported sflow version %d", datagramVersion);
+        if (version != 5) {
+            Config.LOG_ERROR("not supported sflow version %d", version);
             return;
         }
 
@@ -106,11 +106,11 @@ public class SFlowDatagram {
             SFlowSample sample = null;
             switch (sampleType) {
                 case COUNTERS_SAMPLE_TYPE: {
-                    sample = new CounterSample(bytes, sourceIP, timestamp, false);
+                    sample = new CounterSample(bytes, source_ip, timestamp, false);
                     break;
                 }
                 case COUNTERS_SAMPLE_EXPANDED_TYPE: {
-                    sample = new CounterSample(bytes, sourceIP, timestamp,true);
+                    sample = new CounterSample(bytes, source_ip, timestamp,true);
                     break;
                 }
                 case FLOW_SAMPLE_TYPE:
@@ -124,6 +124,7 @@ public class SFlowDatagram {
             if (sample != null) {
                 try {
                     sample.decode();
+                    sample.saveToDb();
                 } catch (Exception e) {
                     Config.LOG_ERROR("process error :" + e.getMessage());
                     continue;

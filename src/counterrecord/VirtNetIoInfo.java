@@ -4,10 +4,8 @@ import config.Config;
 
 import java.util.HashMap;
 
-/**
- * Created by cloud on 17-5-3.
- */
-public class VirtNetIoInfo extends CounterRecord {
+
+public class VirtNetIoInfo extends VirtCounterRecord {
 
     private long vnio_bytes_in;    /* total bytes received */
     private long vnio_packets_in;  /* total packets received */
@@ -18,8 +16,15 @@ public class VirtNetIoInfo extends CounterRecord {
     private long vnio_errs_out;    /* total transmit errors */
     private long vnio_drops_out;   /* total transmit drops */
 
-    public VirtNetIoInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private VirtNetIoInfo(byte[] bytes, String source_ip, long timestamp) {
+        super(bytes, source_ip, timestamp);
+    }
+
+    static public VirtNetIoInfo fromBytes(byte[] bytes, String source_ip, long timestamp)
+            throws Exception {
+        VirtNetIoInfo info = new VirtNetIoInfo(bytes, source_ip, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

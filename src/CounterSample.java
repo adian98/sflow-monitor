@@ -3,6 +3,7 @@ import counterrecord.HostDescription;
 import counterrecord.VirtNodeInfo;
 
 import java.nio.ByteBuffer;
+import java.util.HashSet;
 import counterrecord.*;
 
 public class CounterSample implements SFlowSample {
@@ -20,18 +21,24 @@ public class CounterSample implements SFlowSample {
     private static final int VIRT_NET_IO_TYPE = 0X0 | 2104;
 
     private ByteBuffer buffer;
-    private boolean isExpanded;
-    private int idType;
-    private int idIndex;
+    private boolean is_expanded;
+    private int id_type;
+    private int id_index;
     private int records;
-    private String sourceIp;
+    private String source_ip;
     private long timestamp;
 
-    public CounterSample(byte[] bytes, String sourceIp, long timestamp, boolean isExpanded) {
+    private HashSet<HostCounterRecord> host_records;
+    private HashSet<VirtCounterRecord> virt_records;
+    private HostDescription description;
+
+    public CounterSample(byte[] bytes, String source_ip, long timestamp, boolean is_expanded) {
         this.buffer = ByteBuffer.wrap(bytes);
-        this.isExpanded = isExpanded;
-        this.sourceIp = sourceIp;
+        this.is_expanded = is_expanded;
+        this.source_ip = source_ip;
         this.timestamp = timestamp;
+        host_records = new HashSet<HostCounterRecord>();
+        virt_records = new HashSet<VirtCounterRecord>();
     }
 
     @Override
@@ -39,13 +46,13 @@ public class CounterSample implements SFlowSample {
         int sequenceNumb = buffer.getInt();
         //Config.LOG_INFO("sample sequence number = %d", sequenceNumb);
 
-        if (isExpanded) {
-            idType = buffer.getInt();
-            idIndex = buffer.getInt();
+        if (is_expanded) {
+            id_type = buffer.getInt();
+            id_index = buffer.getInt();
         } else {
             int id = buffer.getInt();
-            idType = id >> 24;
-            idIndex = id & 0x00ffffff;
+            id_type = id >> 24;
+            id_index = id & 0x00ffffff;
         }
         records = buffer.getInt();
 
@@ -62,43 +69,40 @@ public class CounterSample implements SFlowSample {
             byte[] bytes = new byte[len];
             buffer.get(bytes);
 
-            CounterRecord record = null;
-            //Config.LOG_ERROR("type %d", enterprise | format);
-
             switch (enterprise | format) {
                 case HOST_DESCRIPTION_TYPE:
-                    record = new HostDescription(bytes, sourceIp, timestamp);
+                    description = HostDescription.fromBytes(bytes, source_ip, timestamp);
                     break;
                 case VIRT_NODE_TYPE:
-                    record = new VirtNodeInfo(bytes, sourceIp, timestamp);
+                    //record = new VirtNodeInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_CPU_TYPE:
-                    record = new VirtCpuInfo(bytes, sourceIp, timestamp);
+                    //record = new VirtCpuInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_MEMORY_TYPE:
-                    record = new VirtMemoryInfo(bytes, sourceIp, timestamp);
+                    //record = new VirtMemoryInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_DISK_IO_TYPE:
-                    record = new VirtDiskIoInfo(bytes, sourceIp, timestamp);
+                    //record = new VirtDiskIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_NET_IO_TYPE:
-                    record = new VirtNetIoInfo(bytes, sourceIp, timestamp);
+                    //record = new VirtNetIoInfo(bytes, sourceIp, timestamp);
                     break;
                 case HOST_ADAPTERS_TYPE:
                 case HOST_PARENT_TYPE:
                     /*skip*/
                     break;
                 case HOST_CPU_TYPE:
-                    record = new HostCpuInfo(bytes, sourceIp, timestamp);
+                    host_records.add(HostCpuInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case HOST_MEMORY_TYPE:
-                    record = new HostMemoryInfo(bytes, sourceIp, timestamp);
+                    host_records.add(HostMemoryInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case HOST_DISK_IO_TYPE:
-                    record = new HostDiskIoInfo(bytes, sourceIp, timestamp);
+                    host_records.add(HostDiskIoInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case HOST_NET_IO_TYPE:
-                    record = new HostNetIoInfo(bytes, sourceIp, timestamp);
+                    host_records.add(HostNetIoInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case 1:
                 case 1005:
@@ -108,27 +112,31 @@ public class CounterSample implements SFlowSample {
                 case 2010:
                     /*skip*/
                     break;
-
                 default:
                     Config.LOG_ERROR("not supported type %d", enterprise | format);
                     break;
-
             }
-
-            try {
-                if (record != null) {
-                    record.decode();
-                    record.saveToDb();
-                    Config.LOG_INFO(record.toString());
-                }
-            } catch (Exception e) {
-                Config.LOG_ERROR(e.getMessage());
-            }
-
         }
+    }
 
+    @Override
+    public void saveToDb() throws Exception {
+        assert description != null;
 
-
+        if (virt_records.isEmpty()) {
+            //host record
+            for (HostCounterRecord record : host_records) {
+                record.saveToDb();
+            }
+        } else {
+            //virt record
+            String host_name = description.getHostName();
+            assert host_records.isEmpty();
+            for (VirtCounterRecord record : virt_records) {
+                record.setHostName(host_name);
+                record.saveToDb();
+            }
+        }
 
     }
 }

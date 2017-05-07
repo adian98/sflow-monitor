@@ -4,7 +4,7 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class HostMemoryInfo extends CounterRecord {
+public class HostMemoryInfo extends HostCounterRecord {
     private long mem_total;   /* total bytes */
     private long mem_free;    /* free bytes */
     private long mem_shared;  /* shared bytes */
@@ -17,8 +17,15 @@ public class HostMemoryInfo extends CounterRecord {
     private long swap_in;     /* swap in count */
     private long swap_out;    /* swap out count */
 
-    public HostMemoryInfo(byte[] bytes, String sourceIP, long timestamp) {
+    private HostMemoryInfo(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
+    }
+
+    static public HostMemoryInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        HostMemoryInfo info = new HostMemoryInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

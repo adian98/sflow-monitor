@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class HostDescription extends CounterRecord {
+public class HostDescription extends HostCounterRecord {
     private String hostname;     /* hostname, empty if unknown */
     private String uuid;         /* 16 bytes binary UUID, empty if unknown */
     private String machine_type; /* the processor family */
@@ -16,10 +16,20 @@ public class HostDescription extends CounterRecord {
 
     static HashSet<String> nodeList = loadFromDb();
 
-    public HostDescription(byte[] bytes, String sourceIP, long timestamp) {
+    private HostDescription(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
     }
 
+    static public HostDescription fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        HostDescription info = new HostDescription(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
+    }
+
+    public String getHostName() {
+        return hostname;
+    }
 
     @Override
     public void decode() throws Exception {

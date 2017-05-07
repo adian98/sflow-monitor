@@ -4,13 +4,20 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class VirtCpuInfo extends CounterRecord {
+public class VirtCpuInfo extends VirtCounterRecord {
     private long vcpu_state;         /* virtDomainState */
     private long vcpu_cpu_time;      /* the CPU time used (ms) */
     private long vcpu_cpu_count;     /* number of virtual CPUs for the domain */
 
-    public VirtCpuInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private VirtCpuInfo(byte[] bytes, String source_ip, long timestamp) {
+        super(bytes, source_ip, timestamp);
+    }
+
+    static public VirtCpuInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        VirtCpuInfo info = new VirtCpuInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

@@ -4,12 +4,19 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class VirtMemoryInfo extends CounterRecord {
+public class VirtMemoryInfo extends VirtCounterRecord {
     private long vmem_memory;       /* memory in bytes used by domain */
     private long vmem_max_memory;   /* memory in bytes allowed */
 
-    public VirtMemoryInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private VirtMemoryInfo(byte[] bytes, String source_ip, long timestamp) {
+        super(bytes, source_ip, timestamp);
+    }
+
+    static public VirtMemoryInfo fromBytes(byte[] bytes, String source_ip, long timestamp)
+            throws Exception {
+        VirtMemoryInfo info = new VirtMemoryInfo(bytes, source_ip, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override
@@ -17,6 +24,7 @@ public class VirtMemoryInfo extends CounterRecord {
         vmem_memory = buffer.getLong();
         vmem_max_memory = buffer.getLong();
     }
+
 
     @Override
     protected HashMap<String, Object> getMap() {

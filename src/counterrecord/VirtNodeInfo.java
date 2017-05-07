@@ -3,15 +3,22 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class VirtNodeInfo extends CounterRecord {
+public class VirtNodeInfo extends VirtCounterRecord {
     private long vnode_mhz;          /* expected CPU frequency */
     private long vnode_cpus;         /* the number of active CPUs */
     private long vnode_memory;       /* memory size in bytes */
     private long vnode_memory_free;  /* unassigned memory in bytes */
     private long vnode_num_domains;  /* number of active domains */
 
-    public VirtNodeInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private VirtNodeInfo(byte[] bytes, String source_ip, long timestamp) {
+        super(bytes, source_ip, timestamp);
+    }
+
+    static public VirtNodeInfo fromBytes(byte[] bytes, String source_ip, long timestamp)
+            throws Exception {
+        VirtNodeInfo info = new VirtNodeInfo(bytes, source_ip, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

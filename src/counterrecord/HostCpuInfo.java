@@ -2,9 +2,10 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
-public class HostCpuInfo extends CounterRecord {
+public class HostCpuInfo extends HostCounterRecord {
 
     private float cpu_load_one;       /* 1 minute load avg., -1.0 = unknown */
     private float cpu_load_five;      /* 5 minute load avg., -1.0 = unknown */
@@ -24,10 +25,15 @@ public class HostCpuInfo extends CounterRecord {
     private long cpu_interrupts;      /* interrupt count */
     private long cpu_contexts;        /* context switch count */
 
-
-
-    public HostCpuInfo(byte[] bytes, String sourceIP, long timestamp) {
+    private HostCpuInfo(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
+    }
+
+    static public HostCpuInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        HostCpuInfo info = new HostCpuInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override
@@ -99,4 +105,11 @@ public class HostCpuInfo extends CounterRecord {
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
     }
 
+    @Override
+    public void saveToDb() throws Exception {
+        String sql = "INSERT INTO host_description " +
+                "(host_ip, timestamp, hostname ,uuid, machine_type, os_name, os_release) " +
+                "VALUES(?,?,?,?,?,?,?)";
+
+    }
 }

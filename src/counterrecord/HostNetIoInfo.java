@@ -4,7 +4,7 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class HostNetIoInfo extends CounterRecord {
+public class HostNetIoInfo extends HostCounterRecord {
     private long bytes_in;     /* total bytes in */
     private long packets_in;   /* total packets in */
     private long errs_in;      /* total errors in */
@@ -14,8 +14,15 @@ public class HostNetIoInfo extends CounterRecord {
     private long errs_out;     /* total errors out */
     private long drops_out;    /* total drops out */
 
-    public HostNetIoInfo(byte[] bytes, String sourceIP, long timestamp) {
+    private HostNetIoInfo(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
+    }
+
+    static public HostNetIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        HostNetIoInfo info = new HostNetIoInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

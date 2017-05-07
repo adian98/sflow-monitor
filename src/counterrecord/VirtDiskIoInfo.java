@@ -4,7 +4,7 @@ import config.Config;
 import java.util.HashMap;
 
 
-public class VirtDiskIoInfo extends CounterRecord {
+public class VirtDiskIoInfo extends VirtCounterRecord {
     private long vdsk_capacity;     /* logical size in bytes */
     private long vdsk_allocation;   /* current allocation in bytes */
     private long vdsk_available;    /* remaining free bytes */
@@ -14,8 +14,16 @@ public class VirtDiskIoInfo extends CounterRecord {
     private long vdsk_wr_bytes;     /* number of  written bytes */
     private long vdsk_errs;         /* read/write errors */
 
-    public VirtDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
+    private VirtDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
+    }
+
+
+    static public VirtDiskIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        VirtDiskIoInfo info = new VirtDiskIoInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override

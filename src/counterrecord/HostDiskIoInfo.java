@@ -5,7 +5,7 @@ import config.Config;
 
 import java.util.HashMap;
 
-public class HostDiskIoInfo extends CounterRecord {
+public class HostDiskIoInfo extends HostCounterRecord {
     private long  disk_total;     /* total disk size in bytes */
     private long  disk_free;      /* total disk free in bytes */
     private float part_max_used;  /* utilization of most utilized partition */
@@ -16,8 +16,15 @@ public class HostDiskIoInfo extends CounterRecord {
     private long  bytes_written;  /* bytes written */
     private long  write_time;     /* write time (ms) */
 
-    public HostDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
+    private HostDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
         super(bytes, sourceIP, timestamp);
+    }
+
+    static public HostDiskIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+            throws Exception {
+        HostDiskIoInfo info = new HostDiskIoInfo(bytes, sourceIP, timestamp);
+        info.decode();
+        return info;
     }
 
     @Override
