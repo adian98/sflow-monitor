@@ -14,14 +14,14 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
     private long vdsk_wr_bytes;     /* number of  written bytes */
     private long vdsk_errs;         /* read/write errors */
 
-    private VirtDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private VirtDiskIoInfo(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
 
-    static public VirtDiskIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public VirtDiskIoInfo fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        VirtDiskIoInfo info = new VirtDiskIoInfo(bytes, sourceIP, timestamp);
+        VirtDiskIoInfo info = new VirtDiskIoInfo(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }

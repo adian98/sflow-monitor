@@ -16,13 +16,13 @@ public class HostNetIoInfo extends HostCounterRecord {
     private long errs_out;     /* total errors out */
     private long drops_out;    /* total drops out */
 
-    private HostNetIoInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private HostNetIoInfo(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
-    static public HostNetIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public HostNetIoInfo fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        HostNetIoInfo info = new HostNetIoInfo(bytes, sourceIP, timestamp);
+        HostNetIoInfo info = new HostNetIoInfo(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }

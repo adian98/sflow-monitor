@@ -19,13 +19,13 @@ public class HostMemoryInfo extends HostCounterRecord {
     private long swap_in;     /* swap in count */
     private long swap_out;    /* swap out count */
 
-    private HostMemoryInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private HostMemoryInfo(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
-    static public HostMemoryInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public HostMemoryInfo fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        HostMemoryInfo info = new HostMemoryInfo(bytes, sourceIP, timestamp);
+        HostMemoryInfo info = new HostMemoryInfo(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }

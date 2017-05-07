@@ -26,13 +26,13 @@ public class HostCpuInfo extends HostCounterRecord {
     private long cpu_interrupts;      /* interrupt count */
     private long cpu_contexts;        /* context switch count */
 
-    private HostCpuInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private HostCpuInfo(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
-    static public HostCpuInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public HostCpuInfo fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        HostCpuInfo info = new HostCpuInfo(bytes, sourceIP, timestamp);
+        HostCpuInfo info = new HostCpuInfo(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }

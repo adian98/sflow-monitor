@@ -16,13 +16,13 @@ public class HostDescription extends HostCounterRecord {
 
     static HashSet<String> nodeList = loadFromDb();
 
-    private HostDescription(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private HostDescription(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
-    static public HostDescription fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public HostDescription fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        HostDescription info = new HostDescription(bytes, sourceIP, timestamp);
+        HostDescription info = new HostDescription(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }

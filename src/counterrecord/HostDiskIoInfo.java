@@ -18,13 +18,13 @@ public class HostDiskIoInfo extends HostCounterRecord {
     private long  bytes_written;  /* bytes written */
     private long  write_time;     /* write time (ms) */
 
-    private HostDiskIoInfo(byte[] bytes, String sourceIP, long timestamp) {
-        super(bytes, sourceIP, timestamp);
+    private HostDiskIoInfo(byte[] bytes, String host_ip, long timestamp) {
+        super(bytes, host_ip, timestamp);
     }
 
-    static public HostDiskIoInfo fromBytes(byte[] bytes, String sourceIP, long timestamp)
+    static public HostDiskIoInfo fromBytes(byte[] bytes, String host_ip, long timestamp)
             throws Exception {
-        HostDiskIoInfo info = new HostDiskIoInfo(bytes, sourceIP, timestamp);
+        HostDiskIoInfo info = new HostDiskIoInfo(bytes, host_ip, timestamp);
         info.decode();
         return info;
     }
