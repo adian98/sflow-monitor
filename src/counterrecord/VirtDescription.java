@@ -12,7 +12,8 @@ public class VirtDescription extends VirtCounterRecord {
     static private HashSet<String> virt_list;
 
     public VirtDescription(String host_ip, long timestamp, String host_name) {
-        super(null, host_ip, timestamp);
+        //fix me : remove new byte[1]
+        super(new byte[1], host_ip, timestamp);
         setHostName(host_name);
     }
 
@@ -33,7 +34,7 @@ public class VirtDescription extends VirtCounterRecord {
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                virt_list.add(rs.getString("virt_description"));
+                virt_list.add(rs.getString("hostname"));
             }
 
             Config.putJdbcConnection(conn);
@@ -51,17 +52,17 @@ public class VirtDescription extends VirtCounterRecord {
     public void saveToDb() throws Exception {
         Connection conn = Config.getJdbcConnection();
 
-        if (HostDescription.contains(host_name)) {
+        if (VirtDescription.contains(hostname)) {
             //update
             String sql = "UPDATE virt_description " +
                     "set host_ip = ?, " +
-                    "SET timestamp = ?, " +
-                    "WHERE hostname = ?";
+                    "timestamp = ? " +
+                    "WHERE hostname = ?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
 
             pstmt.setString(1, host_ip);
             pstmt.setLong(2, timestamp);
-            pstmt.setString(3, host_name);
+            pstmt.setString(3, hostname);
             pstmt.executeUpdate();
 
         } else {
@@ -72,11 +73,11 @@ public class VirtDescription extends VirtCounterRecord {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, host_ip);
             pstmt.setLong(2, timestamp);
-            pstmt.setString(3, host_name);
+            pstmt.setString(3, hostname);
 
             pstmt.executeUpdate();
             synchronized (virt_list) {
-                virt_list.add(host_name);
+                virt_list.add(hostname);
             }
         }
         Config.putJdbcConnection(conn);

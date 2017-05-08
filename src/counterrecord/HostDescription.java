@@ -211,7 +211,7 @@ public class HostDescription extends HostCounterRecord {
                     "machine_type = ?, " +
                     "os_name = ?, " +
                     "os_release = ? " +
-                    "WHERE host_ip = ?";
+                    "WHERE host_ip = ?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
 
             pstmt.setLong(1, timestamp);

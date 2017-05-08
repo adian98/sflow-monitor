@@ -72,10 +72,11 @@ public class CounterSample implements SFlowSample {
                     description = HostDescription.fromBytes(bytes, source_ip, timestamp);
                     break;
                 case VIRT_NODE_TYPE:
+                    //virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
                     //record = new VirtNodeInfo(bytes, sourceIp, timestamp);
                     break;
                 case VIRT_CPU_TYPE:
-                    //record = new VirtCpuInfo(bytes, sourceIp, timestamp);
+                    virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case VIRT_MEMORY_TYPE:
                     //record = new VirtMemoryInfo(bytes, sourceIp, timestamp);
@@ -119,10 +120,13 @@ public class CounterSample implements SFlowSample {
 
     @Override
     public void saveToDb() throws Exception {
-        assert description != null;
+        if (description == null) {
+            return;
+        }
 
         if (virt_records.isEmpty()) {
             //host record
+            description.saveToDb();
             for (HostCounterRecord record : host_records) {
                 record.saveToDb();
             }

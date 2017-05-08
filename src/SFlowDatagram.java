@@ -127,6 +127,7 @@ public class SFlowDatagram {
                     sample.saveToDb();
                 } catch (Exception e) {
                     Config.LOG_ERROR("process error :" + e.getMessage());
+                    e.printStackTrace();
                     continue;
                 }
 
