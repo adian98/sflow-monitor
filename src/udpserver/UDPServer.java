@@ -11,11 +11,12 @@ import java.nio.channels.DatagramChannel;
 public class UDPServer implements Runnable{
 
     private static int MAX_SFLOW_PKT_SIZ = 65536;
-
     private int port;
+    boolean is_running;
 
     public UDPServer(int port) {
         this.port = port;
+        is_running = true;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class UDPServer implements Runnable{
             return;
         }
 
-        while(true) {
+        while(is_running) {
             ByteBuffer buf = ByteBuffer.allocate(MAX_SFLOW_PKT_SIZ);
             buf.clear();
             InetSocketAddress socketAddress;
@@ -51,12 +52,5 @@ public class UDPServer implements Runnable{
                 Config.LOG_ERROR(e.getMessage());
             }
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Config.init();
-        Thread thread = new Thread(new UDPServer(6343));
-        thread.start();
-        thread.join();
     }
 }
