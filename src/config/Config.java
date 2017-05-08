@@ -38,6 +38,10 @@ public class Config {
         ConnectionPool.initDb();
     }
 
+    static public void destroyed() {
+        config.connectionPool.releaseConnections();
+    }
+
     private Config() {
         //defaut
         logger.setLevel(Level.ALL);

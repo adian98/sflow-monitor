@@ -8,36 +8,40 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class ConnectionPool {
-    int maxSize;
-    Queue<Connection> connections;
+    private int maxSize;
+    private Queue<Connection> connections;
 
     public ConnectionPool(int maxSize) {
         this.maxSize = maxSize;
         connections = new LinkedList<Connection>();
     }
 
-    public synchronized Connection get() throws Exception {
-        if (connections.size() > maxSize) {
-            throw new Exception("db connections too large");
-        }
+    public Connection get() throws Exception {
+        synchronized (connections) {
+            if (connections.size() > maxSize) {
+                throw new Exception("db connections too large");
+            }
 
-        if (connections.isEmpty()) {
-            return DriverManager.getConnection(Config.dbPath());
-        } else {
-            return connections.remove();
+            if (connections.isEmpty()) {
+                return DriverManager.getConnection(Config.dbPath());
+            } else {
+                return connections.remove();
+            }
         }
     }
 
-    public synchronized void put(Connection con) throws Exception {
-
-        if (connections.size() > maxSize) {
-            throw new Exception("db connections too large");
-        } else {
-            connections.offer(con);
+    public void put(Connection con) throws Exception {
+        synchronized (connections) {
+            if (connections.size() > maxSize) {
+                throw new Exception("db connections too large");
+            } else {
+                connections.offer(con);
+            }
         }
     }
 
     static public void initDb() throws  Exception {
+        Class.forName("org.sqlite.JDBC");
         Connection conn = DriverManager.getConnection(Config.dbPath());
         Statement stmt = conn.createStatement();
         DatabaseMetaData meta = conn.getMetaData();
@@ -65,4 +69,17 @@ public class ConnectionPool {
         HostDescription.loadFromDb();
         VirtDescription.loadFromDb();
     }
+
+    public void releaseConnections() {
+        synchronized (connections) {
+            for (Connection c: connections) {
+                try {
+                    c.close();
+                } catch (Exception e) {
+                    Config.LOG_ERROR("close connection error " + e.getLocalizedMessage());
+                }
+            }
+        }
+    }
+
 }
