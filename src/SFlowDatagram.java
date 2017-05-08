@@ -32,7 +32,7 @@ public class SFlowDatagram {
 
 
     public void process() throws Exception {
-        Config.LOG_INFO("startdatagram ===========================");
+        //Config.LOG_INFO("startdatagram ===========================");
         //Config.LOG_INFO("source ip = %s size = %d", sourceIP, size);
 
         //java use network endian
@@ -95,7 +95,7 @@ public class SFlowDatagram {
 
 
     private void decode_samples() throws Exception {
-        Config.LOG_INFO("------------start sample---------------");
+        //Config.LOG_INFO("------------start sample---------------");
         for (int i = 0; i < samples; ++i) {
 
             int sampleType = buffer.getInt();
