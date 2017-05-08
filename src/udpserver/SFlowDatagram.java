@@ -1,3 +1,5 @@
+package udpserver;
+
 import config.Config;
 
 import java.net.Inet4Address;
