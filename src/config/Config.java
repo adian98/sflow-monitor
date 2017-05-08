@@ -11,7 +11,6 @@ import java.util.logging.*;
 
 
 class LogFormatter extends Formatter {
-
     static DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     static Calendar calendar = new GregorianCalendar();
 
@@ -31,9 +30,15 @@ public class Config {
     private ConnectionPool connectionPool = new ConnectionPool(10);
 
     //singleton
-    static Config config = new Config();
+    static Config config;
 
-    public Config() {
+    static public void init() throws Exception {
+        config = new Config();
+
+        ConnectionPool.initDb();
+    }
+
+    private Config() {
         //defaut
         logger.setLevel(Level.ALL);
 
@@ -62,5 +67,9 @@ public class Config {
 
     static public void putJdbcConnection(Connection conn) throws Exception{
         config.connectionPool.put(conn);
+    }
+
+    static public String dbPath() {
+        return "jdbc:sqlite:/tmp/db.db";
     }
 }

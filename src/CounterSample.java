@@ -1,7 +1,5 @@
 import config.Config;
 import counterrecord.HostDescription;
-import counterrecord.VirtNodeInfo;
-
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import counterrecord.*;
@@ -132,6 +130,9 @@ public class CounterSample implements SFlowSample {
             //virt record
             String host_name = description.getHostName();
             assert host_records.isEmpty();
+            VirtDescription description = new VirtDescription(source_ip, timestamp, host_name);
+            description.saveToDb();
+
             for (VirtCounterRecord record : virt_records) {
                 record.setHostName(host_name);
                 record.saveToDb();

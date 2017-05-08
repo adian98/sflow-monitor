@@ -10,6 +10,7 @@ public class VirtCounterRecord extends AbstractCounterRecord {
         super(bytes, host_ip, timestamp);
     }
 
+
     public void setHostName(String host_name) {
         this.host_name = host_name;
     }

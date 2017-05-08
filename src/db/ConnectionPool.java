@@ -1,5 +1,6 @@
 package db;
 
+import config.Config;
 import counterrecord.*;
 
 import java.sql.*;
@@ -21,7 +22,7 @@ public class ConnectionPool {
         }
 
         if (connections.isEmpty()) {
-            return ConnectionPool.newConnection("jdbc:sqlite:/tmp/db.db");
+            return DriverManager.getConnection(Config.dbPath());
         } else {
             return connections.remove();
         }
@@ -36,19 +37,27 @@ public class ConnectionPool {
         }
     }
 
-    private static Connection newConnection(String url) throws Exception {
-        Connection conn =  DriverManager.getConnection(url);
+    static public void initDb() throws  Exception {
+        Connection conn = DriverManager.getConnection(Config.dbPath());
         Statement stmt = conn.createStatement();
         DatabaseMetaData meta = conn.getMetaData();
         ResultSet tabs = meta.getTables(null, null, "host_description", null);
         if (!tabs.next()) {
             //create tables
             stmt.execute(HostDescription.schema());
+            stmt.execute(HostNetIoInfo.schema());
             stmt.execute(HostCpuInfo.schema());
             stmt.execute(HostDiskIoInfo.schema());
             stmt.execute(HostMemoryInfo.schema());
-            stmt.execute(HostNetIoInfo.schema());
+
+            stmt.execute(VirtDescription.schema());
+
         }
-        return conn;
+        conn.close();
+
+        Config.LOG_INFO("init db success");
+
+        HostDescription.loadFromDb();
+        VirtDescription.loadFromDb();
     }
 }

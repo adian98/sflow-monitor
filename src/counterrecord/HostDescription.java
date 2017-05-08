@@ -14,7 +14,7 @@ public class HostDescription extends HostCounterRecord {
     private String os_name;      /* Operating system */
     private String os_release;   /* e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown */
 
-    static HashSet<String> nodeList = loadFromDb();
+    static private HashSet<String> nodeList;
 
     private HostDescription(byte[] bytes, String host_ip, long timestamp) {
         super(bytes, host_ip, timestamp);
@@ -176,8 +176,8 @@ public class HostDescription extends HostCounterRecord {
                 "os_release TEXT );";
     }
 
-    static private HashSet<String> loadFromDb() {
-        HashSet<String> set = new HashSet<String>();
+    static public void loadFromDb() {
+        nodeList = new HashSet<String>();
         Connection conn;
         try {
             conn = Config.getJdbcConnection();
@@ -186,15 +186,13 @@ public class HostDescription extends HostCounterRecord {
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                set.add(rs.getString("host_ip"));
+                nodeList.add(rs.getString("host_ip"));
             }
 
             Config.putJdbcConnection(conn);
         } catch (Exception e) {
             Config.LOG_ERROR(e.getMessage());
         }
-
-        return set;
     }
 
     static public synchronized boolean contains(String host) {

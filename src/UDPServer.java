@@ -49,12 +49,11 @@ public class UDPServer implements Runnable{
             }catch (Exception e) {
                 Config.LOG_ERROR(e.getMessage());
             }
-
         }
-
     }
 
     public static void main(String[] args) throws Exception {
+        Config.init();
         Thread thread = new Thread(new UDPServer(6343));
         thread.start();
         thread.join();
