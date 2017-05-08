@@ -72,8 +72,7 @@ public class CounterSample implements SFlowSample {
                     description = HostDescription.fromBytes(bytes, source_ip, timestamp);
                     break;
                 case VIRT_NODE_TYPE:
-                    //virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
-                    //record = new VirtNodeInfo(bytes, sourceIp, timestamp);
+                    virt_records.add(VirtNodeInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case VIRT_CPU_TYPE:
                     virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
@@ -85,7 +84,7 @@ public class CounterSample implements SFlowSample {
                     virt_records.add(VirtDiskIoInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case VIRT_NET_IO_TYPE:
-                    //record = new VirtNetIoInfo(bytes, sourceIp, timestamp);
+                    virt_records.add(VirtNetIoInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case HOST_ADAPTERS_TYPE:
                 case HOST_PARENT_TYPE:

@@ -1,6 +1,8 @@
 package counterrecord;
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 public class VirtNodeInfo extends VirtCounterRecord {
@@ -39,5 +41,38 @@ public class VirtNodeInfo extends VirtCounterRecord {
         map.put("vnode_memory_free", vnode_memory_free);
         map.put("vnode_num_domains", vnode_num_domains);
         return map;
+    }
+
+    public static String schema() {
+        return "CREATE TABLE virt_node (" +
+                "host_ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "hostname TEXT, " +
+                "vnode_mhz INTEGER, " +
+                "vnode_cpus INTEGER, " +
+                "vnode_memory INTEGER, " +
+                "vnode_memory_free INTEGER, " +
+                "vnode_num_domains INTEGER, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO virt_node " +
+                "(host_ip, timestamp, hostname, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
+                "VALUES(?,?,?,?,?,?,?,?);";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setString(3, hostname);
+        pstmt.setLong(4,  vnode_mhz);
+        pstmt.setLong(5, vnode_cpus);
+        pstmt.setLong(6, vnode_memory);
+        pstmt.setLong(7, vnode_memory_free);
+        pstmt.setLong(8, vnode_num_domains);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
     }
 }
