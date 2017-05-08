@@ -21,7 +21,8 @@ public class VirtDescription extends VirtCounterRecord {
         return "CREATE TABLE virt_description (" +
                 "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT);";
+                "hostname TEXT, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip));";
     }
 
     static public void loadFromDb() {

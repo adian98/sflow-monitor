@@ -1,6 +1,8 @@
 package counterrecord;
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 
@@ -51,4 +53,45 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
         map.put("vdsk_errs", vdsk_errs);
         return map;
     }
+
+    public static String schema() {
+        return "CREATE TABLE virt_disk_io (" +
+                "host_ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "hostname TEXT, " +
+                "vdsk_capacity INTEGER, " +
+                "vdsk_allocation INTEGER, " +
+                "vdsk_available INTEGER, " +
+                "vdsk_rd_req INTEGER, " +
+                "vdsk_rd_bytes INTEGER, " +
+                "vdsk_wr_req INTEGER, " +
+                "vdsk_wr_bytes INTEGER, " +
+                "vdsk_errs INTEGER, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO virt_disk_io " +
+                "(host_ip, timestamp, hostname, vdsk_capacity, vdsk_allocation, vdsk_available," +
+                "vdsk_rd_req, vdsk_rd_bytes, vdsk_wr_req, vdsk_wr_bytes, vdsk_errs)" +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?);";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setString(3, hostname);
+        pstmt.setLong(4, vdsk_capacity);
+        pstmt.setLong(5, vdsk_allocation);
+        pstmt.setLong(6, vdsk_available);
+        pstmt.setLong(7, vdsk_rd_req);
+        pstmt.setLong(8, vdsk_rd_bytes);
+        pstmt.setLong(9, vdsk_wr_req);
+        pstmt.setLong(10, vdsk_wr_bytes);
+        pstmt.setLong(11, vdsk_errs);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
+    }
+
 }

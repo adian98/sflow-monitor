@@ -52,6 +52,7 @@ public class ConnectionPool {
 
             stmt.execute(VirtDescription.schema());
             stmt.execute(VirtCpuInfo.schema());
+            stmt.execute(VirtDiskIoInfo.schema());
 
         }
         conn.close();
