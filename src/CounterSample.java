@@ -79,7 +79,7 @@ public class CounterSample implements SFlowSample {
                     virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case VIRT_MEMORY_TYPE:
-                    //record = new VirtMemoryInfo(bytes, sourceIp, timestamp);
+                    virt_records.add(VirtMemoryInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
                 case VIRT_DISK_IO_TYPE:
                     virt_records.add(VirtDiskIoInfo.fromBytes(bytes, source_ip, timestamp));

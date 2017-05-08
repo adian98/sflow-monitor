@@ -2,6 +2,8 @@ package counterrecord;
 
 import config.Config;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 
 public class VirtMemoryInfo extends VirtCounterRecord {
@@ -32,5 +34,32 @@ public class VirtMemoryInfo extends VirtCounterRecord {
         map.put("vmem_memory", vmem_memory);
         map.put("vmem_max_memory", vmem_max_memory);
         return map;
+    }
+
+    public static String schema() {
+        return "CREATE TABLE virt_memory (" +
+                "host_ip TEXT NOT NULL, " +
+                "timestamp INTEGER, " +
+                "hostname TEXT, " +
+                "vmem_memory INTEGER, " +
+                "vmem_max_memory INTEGER, " +
+                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+    }
+
+    @Override
+    public void saveToDb() throws Exception {
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "INSERT INTO virt_memory " +
+                "(host_ip, timestamp, hostname, vmem_memory, vmem_max_memory)" +
+                "VALUES(?,?,?,?,?);";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, timestamp);
+        pstmt.setString(3, hostname);
+        pstmt.setLong(4, vmem_memory);
+        pstmt.setLong(5, vmem_max_memory);
+        pstmt.executeUpdate();
+        Config.putJdbcConnection(conn);
     }
 }
