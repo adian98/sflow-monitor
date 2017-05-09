@@ -3,8 +3,8 @@ package servlet;
 import config.Config;
 import net.sf.json.JSONObject;
 import servlet.controller.AbstractController;
-import servlet.controller.ErrorController;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,29 +24,41 @@ public class ApiServlet extends HttpServlet {
         resp.setContentType("application/json-rpc");
 
         JSONObject body;
-        String method;
-        int id;
-        JSONObject params;
         try {
             body = getBody(req);
-            id = body.getInt("id");
+        } catch (Exception e) {
+            Config.LOG_ERROR("get body error %s", e.getMessage());
+            RequestDispatcher rd = req.getRequestDispatcher("invalid_json.jsp");
+            rd.forward(req, resp);
+            return;
+        }
+        String method;
+        String id = null;
+        JSONObject params;
+        try {
             method = body.getString("method");
+            id = body.getString("id");
             params = body.getJSONObject("params");
         } catch (Exception e) {
-            Config.LOG_ERROR(e.getMessage());
-            new ErrorController(-1, Error.INVALID_PARAMS).handle(req, resp);
+            Config.LOG_ERROR("get method error %s", e.getMessage());
+            RequestDispatcher rd = req.getRequestDispatcher("invalid_json.jsp");
+            rd.forward(req, resp);
             return;
         }
 
         AbstractController controller;
         switch (method) {
+            case "add":
+                return;
 
 
             default: {
-                new ErrorController(id, Error.INVALID_PARAMS).handle(req, resp);
+                Config.LOG_ERROR("invalid ");
             }
         }
     }
+
+
 
     private JSONObject getBody(HttpServletRequest req)
             throws ServletException, IOException {
