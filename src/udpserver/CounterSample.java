@@ -130,13 +130,13 @@ public class CounterSample implements SFlowSample {
         if (!host_records.isEmpty() && virt_records.isEmpty()) {
             //host record
             description.saveToDb();
-            Config.LOG_INFO("only host info %S", source_ip);
+            //Config.LOG_INFO("only host info %S", source_ip);
             for (HostCounterRecord record : host_records) {
                 record.saveToDb();
             }
         } else if (!virt_records.isEmpty() && host_records.isEmpty()){
             //virt record
-            Config.LOG_INFO("only virt info %s", source_ip);
+            //Config.LOG_INFO("only virt info %s", source_ip);
             String host_name = description.getHostName();
             assert host_records.isEmpty();
             VirtDescription description = new VirtDescription(source_ip, timestamp, host_name);
