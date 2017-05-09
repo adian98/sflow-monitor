@@ -14,7 +14,7 @@ public class CounterSample implements SFlowSample {
     private static final int HOST_MEMORY_TYPE = 0X0 | 2004;
     private static final int HOST_DISK_IO_TYPE = 0X0 | 2005;
     private static final int HOST_NET_IO_TYPE = 0X0 | 2006;
-    private static final int VIRT_NODE_TYPE = 0X0 | 2100;
+    private static final int HOST_NODE_TYPE = 0X0 | 2100;
     private static final int VIRT_CPU_TYPE = 0X0 | 2101;
     private static final int VIRT_MEMORY_TYPE = 0X0 | 2102;
     private static final int VIRT_DISK_IO_TYPE = 0X0 | 2103;
@@ -73,9 +73,6 @@ public class CounterSample implements SFlowSample {
                 case HOST_DESCRIPTION_TYPE:
                     description = HostDescription.fromBytes(bytes, source_ip, timestamp);
                     break;
-                case VIRT_NODE_TYPE:
-                    virt_records.add(VirtNodeInfo.fromBytes(bytes, source_ip, timestamp));
-                    break;
                 case VIRT_CPU_TYPE:
                     virt_records.add(VirtCpuInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
@@ -104,6 +101,9 @@ public class CounterSample implements SFlowSample {
                 case HOST_NET_IO_TYPE:
                     host_records.add(HostNetIoInfo.fromBytes(bytes, source_ip, timestamp));
                     break;
+                case HOST_NODE_TYPE:
+                    host_records.add(HostNodeInfo.fromBytes(bytes, source_ip, timestamp));
+                    break;
                 case 1:
                 case 1005:
                 case 2007:
@@ -125,14 +125,18 @@ public class CounterSample implements SFlowSample {
             return;
         }
 
-        if (virt_records.isEmpty()) {
+
+
+        if (!host_records.isEmpty() && virt_records.isEmpty()) {
             //host record
             description.saveToDb();
+            Config.LOG_INFO("only host info %S", source_ip);
             for (HostCounterRecord record : host_records) {
                 record.saveToDb();
             }
-        } else {
+        } else if (!virt_records.isEmpty() && host_records.isEmpty()){
             //virt record
+            Config.LOG_INFO("only virt info %s", source_ip);
             String host_name = description.getHostName();
             assert host_records.isEmpty();
             VirtDescription description = new VirtDescription(source_ip, timestamp, host_name);
@@ -142,6 +146,9 @@ public class CounterSample implements SFlowSample {
                 record.setHostName(host_name);
                 record.saveToDb();
             }
+        } else {
+            //never happened
+            Config.LOG_ERROR("both host and virt info %s", source_ip);
         }
 
     }

@@ -5,20 +5,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
 
-public class VirtNodeInfo extends VirtCounterRecord {
+public class HostNodeInfo extends HostCounterRecord {
     private long vnode_mhz;          /* expected CPU frequency */
     private long vnode_cpus;         /* the number of active CPUs */
     private long vnode_memory;       /* memory size in bytes */
     private long vnode_memory_free;  /* unassigned memory in bytes */
     private long vnode_num_domains;  /* number of active domains */
 
-    private VirtNodeInfo(byte[] bytes, String source_ip, long timestamp) {
+    private HostNodeInfo(byte[] bytes, String source_ip, long timestamp) {
         super(bytes, source_ip, timestamp);
     }
 
-    static public VirtNodeInfo fromBytes(byte[] bytes, String source_ip, long timestamp)
+    static public HostNodeInfo fromBytes(byte[] bytes, String source_ip, long timestamp)
             throws Exception {
-        VirtNodeInfo info = new VirtNodeInfo(bytes, source_ip, timestamp);
+        HostNodeInfo info = new HostNodeInfo(bytes, source_ip, timestamp);
         info.decode();
         return info;
     }
@@ -44,10 +44,9 @@ public class VirtNodeInfo extends VirtCounterRecord {
     }
 
     public static String schema() {
-        return "CREATE TABLE virt_node (" +
+        return "CREATE TABLE host_node (" +
                 "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT, " +
                 "vnode_mhz INTEGER, " +
                 "vnode_cpus INTEGER, " +
                 "vnode_memory INTEGER, " +
@@ -60,18 +59,17 @@ public class VirtNodeInfo extends VirtCounterRecord {
     public void saveToDb() throws Exception {
         Connection conn = Config.getJdbcConnection();
 
-        String sql = "INSERT INTO virt_node " +
-                "(host_ip, timestamp, hostname, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
-                "VALUES(?,?,?,?,?,?,?,?);";
+        String sql = "INSERT INTO host_node " +
+                "(host_ip, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
+                "VALUES(?,?,?,?,?,?,?);";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
         pstmt.setLong(2, timestamp);
-        pstmt.setString(3, hostname);
-        pstmt.setLong(4,  vnode_mhz);
-        pstmt.setLong(5, vnode_cpus);
-        pstmt.setLong(6, vnode_memory);
-        pstmt.setLong(7, vnode_memory_free);
-        pstmt.setLong(8, vnode_num_domains);
+        pstmt.setLong(3,  vnode_mhz);
+        pstmt.setLong(4, vnode_cpus);
+        pstmt.setLong(5, vnode_memory);
+        pstmt.setLong(6, vnode_memory_free);
+        pstmt.setLong(7, vnode_num_domains);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
     }
