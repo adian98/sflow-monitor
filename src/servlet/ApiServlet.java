@@ -3,6 +3,7 @@ package servlet;
 import config.Config;
 import net.sf.json.JSONObject;
 import servlet.controller.AbstractController;
+import servlet.controller.AddController;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,11 +34,11 @@ public class ApiServlet extends HttpServlet {
             return;
         }
         String method;
-        String id = null;
+        Object id = null;
         JSONObject params;
         try {
             method = body.getString("method");
-            id = body.getString("id");
+            id = body.get("id");
             params = body.getJSONObject("params");
         } catch (Exception e) {
             Config.LOG_ERROR("get method error %s", e.getMessage());
@@ -46,15 +47,26 @@ public class ApiServlet extends HttpServlet {
             return;
         }
 
-        AbstractController controller;
+        AbstractController controller = null;
         switch (method) {
             case "add":
-                return;
+                controller = new AddController(params, id);
+                break;
 
 
             default: {
                 Config.LOG_ERROR("invalid ");
+                req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
+                return;
             }
+        }
+
+        try {
+            controller.handle(req, resp);
+        } catch (Exception e) {
+            Config.LOG_ERROR("controller handler error %s", e.getMessage());
+            //req.setAttribute("id", id);
+            req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
         }
     }
 
