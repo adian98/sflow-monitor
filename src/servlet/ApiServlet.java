@@ -79,6 +79,12 @@ public class ApiServlet extends HttpServlet {
             case "virt.disk":
                 controller = new VirtDiskController(params, id);
                 break;
+            case "virt.memory":
+                controller = new VirtMemoryController(params, id);
+                break;
+            case "virt.net":
+                controller = new VirtNetController(params, id);
+                break;
             default: {
                 Config.LOG_ERROR("invalid mothod");
                 Error.invalidMethod(req, resp);

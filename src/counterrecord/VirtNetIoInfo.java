@@ -4,7 +4,11 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class VirtNetIoInfo extends VirtCounterRecord {
@@ -95,5 +99,38 @@ public class VirtNetIoInfo extends VirtCounterRecord {
         pstmt.setLong(11, vnio_drops_out);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT * FROM virt_net_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, hostname);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("hostname", rs.getString("hostname"));
+            map.put("vnio_bytes_in", rs.getLong("vnio_bytes_in"));
+            map.put("vnio_packets_in", rs.getLong("vnio_packets_in"));
+            map.put("vnio_errs_in", rs.getLong("vnio_errs_in"));
+            map.put("vnio_drops_in", rs.getLong("vnio_drops_in"));
+            map.put("vnio_bytes_out", rs.getLong("vnio_bytes_out"));
+            map.put("vnio_packets_out", rs.getLong("vnio_packets_out"));
+            map.put("vnio_errs_out", rs.getLong("vnio_errs_out"));
+            map.put("vnio_drops_out", rs.getLong("vnio_drops_out"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

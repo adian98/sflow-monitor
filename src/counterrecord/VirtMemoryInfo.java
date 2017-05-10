@@ -4,7 +4,11 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class VirtMemoryInfo extends VirtCounterRecord {
     private long vmem_memory;       /* memory in bytes used by domain */
@@ -61,5 +65,32 @@ public class VirtMemoryInfo extends VirtCounterRecord {
         pstmt.setLong(5, vmem_max_memory);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT * FROM virt_memory WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, hostname);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("hostname", rs.getString("hostname"));
+            map.put("vmem_memory", rs.getLong("vmem_memory"));
+            map.put("vmem_max_memory", rs.getLong("vmem_max_memory"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

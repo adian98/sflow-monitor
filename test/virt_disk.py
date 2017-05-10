@@ -4,7 +4,7 @@ import json
 import unittest
 
 
-class TestHostCpu(unittest.TestCase):
+class TestVirtDisk(unittest.TestCase):
     def setUp(self):
         self.server = jsonrpclib.ServerProxy(config.url)
 
