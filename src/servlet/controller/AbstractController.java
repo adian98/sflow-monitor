@@ -14,11 +14,22 @@ import java.io.IOException;
 public class AbstractController {
     protected Object params;
     protected String id;
-    Result result;
+    protected Result result;
+    protected boolean is_commited;
+
+
+    protected boolean isCommited() {
+        return is_commited;
+    }
+
+    protected void setCommited() {
+        is_commited = true;
+    }
 
     public AbstractController(Object params, String id) {
         this.params = params;
         this.id = id;
+        is_commited = false;
     }
 
     protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
@@ -33,6 +44,10 @@ public class AbstractController {
         String jsp_path = null;
         try {
             result = doHandle(req, resp);
+            if (isCommited()) {
+                return;
+            }
+
             req.setAttribute("result", result);
             jsp_path = "result.jsp";
 ;
