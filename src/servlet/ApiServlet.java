@@ -63,11 +63,12 @@ public class ApiServlet extends HttpServlet {
             case "host.disk":
                 controller = new HostDiskController(params, id);
                 break;
-
             case "host.memory":
                 controller = new HostMemoryController(params, id);
                 break;
-
+            case "host.net":
+                controller = new HostNetIoController(params, id);
+                break;
             default: {
                 Config.LOG_ERROR("invalid mothod");
                 Error.invalidMethod(req, resp);

@@ -4,7 +4,10 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HostNetIoInfo extends HostCounterRecord {
     private long bytes_in;     /* total bytes in */
@@ -90,6 +93,38 @@ public class HostNetIoInfo extends HostCounterRecord {
         pstmt.setLong(10, drops_out);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT * FROM host_net_io WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("bytes_in", rs.getLong("bytes_in"));
+            map.put("packets_in", rs.getLong("packets_in"));
+            map.put("errs_in", rs.getLong("errs_in"));
+            map.put("drops_in", rs.getLong("drops_in"));
+            map.put("bytes_out", rs.getLong("bytes_out"));
+            map.put("packets_out", rs.getLong("packets_out"));
+            map.put("errs_out", rs.getLong("errs_out"));
+            map.put("drops_out", rs.getLong("drops_out"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 
 
