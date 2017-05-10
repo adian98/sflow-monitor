@@ -6,7 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class VirtDescription extends VirtCounterRecord {
     static private HashSet<String> virt_list;
@@ -82,5 +85,22 @@ public class VirtDescription extends VirtCounterRecord {
             }
         }
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb() throws Exception {
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+        String sql = "SELECT host_ip, hostname FROM virt_description;";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("hostname", rs.getString("hostname"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

@@ -69,6 +69,9 @@ public class ApiServlet extends HttpServlet {
             case "host.net":
                 controller = new HostNetIoController(params, id);
                 break;
+            case "virt.description":
+                controller = new VirtDescriptionController(params, id);
+                break;
             default: {
                 Config.LOG_ERROR("invalid mothod");
                 Error.invalidMethod(req, resp);
