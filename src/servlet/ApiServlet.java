@@ -1,6 +1,7 @@
 package servlet;
 
 import config.Config;
+import counterrecord.VirtDiskIoInfo;
 import net.sf.json.JSONObject;
 import servlet.controller.*;
 
@@ -74,6 +75,9 @@ public class ApiServlet extends HttpServlet {
                 break;
             case "virt.cpu":
                 controller = new VirtCpuController(params, id);
+                break;
+            case "virt.disk":
+                controller = new VirtDiskController(params, id);
                 break;
             default: {
                 Config.LOG_ERROR("invalid mothod");

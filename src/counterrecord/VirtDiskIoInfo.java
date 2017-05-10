@@ -3,7 +3,11 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class VirtDiskIoInfo extends VirtCounterRecord {
@@ -92,6 +96,39 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
         pstmt.setLong(11, vdsk_errs);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT * FROM virt_disk_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, hostname);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new LinkedHashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("hostname", rs.getString("hostname"));
+            map.put("vdsk_capacity", rs.getLong("vdsk_capacity"));
+            map.put("vdsk_allocation", rs.getLong("vdsk_allocation"));
+            map.put("vdsk_available", rs.getLong("vdsk_available"));
+            map.put("vdsk_rd_req", rs.getLong("vdsk_rd_req"));
+            map.put("vdsk_rd_bytes", rs.getLong("vdsk_rd_bytes"));
+            map.put("vdsk_wr_req", rs.getLong("vdsk_wr_req"));
+            map.put("vdsk_wr_bytes", rs.getLong("vdsk_wr_bytes"));
+            map.put("vdsk_errs", rs.getLong("vdsk_errs"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 
 }
