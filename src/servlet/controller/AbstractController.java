@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AbstractController {
-    protected JSONObject params;
-    protected Object id;
+    protected Object params;
+    protected String id;
     Result result;
 
-    public AbstractController(JSONObject params, Object id) {
+    public AbstractController(Object params, String id) {
         this.params = params;
         this.id = id;
     }

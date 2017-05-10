@@ -34,15 +34,15 @@ public class ApiServlet extends HttpServlet {
             return;
         }
         String method;
-        Object id = null;
-        JSONObject params;
+        String id = null;
+        Object params;
         try {
             method = body.getString("method");
-            id = body.get("id");
-            params = body.getJSONObject("params");
+            id = body.getString("id");
+            params = body.get("params");
         } catch (Exception e) {
             Config.LOG_ERROR("get method error %s", e.getMessage());
-            RequestDispatcher rd = req.getRequestDispatcher("invalid_json.jsp");
+            RequestDispatcher rd = req.getRequestDispatcher("invalid_request.jsp");
             rd.forward(req, resp);
             return;
         }

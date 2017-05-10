@@ -1,20 +1,28 @@
 package servlet.controller;
 
 
+import org.apache.commons.lang.StringUtils;
+
 public class Result {
     private Object result;
-    private Object id;
+    private String id;
 
-    public Result(Object result, Object id) {
+    public Result(Object result, String id) {
         this.result = result;
-        this.id = id;
+
+        if (id == null || StringUtils.isNumeric(id)) {
+            this.id = id;
+        } else {
+            //json str
+            this.id = "\"" + id + "\"";
+        }
     }
 
     public void setResult(Object result) {
         this.result = result;
     }
 
-    public void setId(Object id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -22,7 +30,7 @@ public class Result {
         return result;
     }
 
-    public Object getId() {
+    public String getId() {
         return id;
     }
 }
