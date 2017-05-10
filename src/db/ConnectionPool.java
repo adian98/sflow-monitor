@@ -1,7 +1,7 @@
 package db;
 
 import config.Config;
-import counterrecord.*;
+import counter_record.*;
 
 import java.sql.*;
 import java.util.LinkedList;

@@ -1,7 +1,7 @@
 package servlet.controller;
 
 
-import counterrecord.VirtDescription;
+import counter_record.VirtDescription;
 import net.sf.json.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;

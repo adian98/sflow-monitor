@@ -1,9 +1,8 @@
-package counterrecord;
+package counter_record;
 import config.Config;
 import net.sf.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

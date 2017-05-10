@@ -1,7 +1,6 @@
-package counterrecord;
+package counter_record;
 
 
-import java.sql.SQLException;
 import java.util.HashMap;
 
 public class VirtCounterRecord extends AbstractCounterRecord {

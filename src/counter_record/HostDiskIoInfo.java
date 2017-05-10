@@ -1,4 +1,4 @@
-package counterrecord;
+package counter_record;
 
 
 import config.Config;

@@ -1,11 +1,9 @@
 package servlet;
 
 import config.Config;
-import counterrecord.VirtDiskIoInfo;
 import net.sf.json.JSONObject;
 import servlet.controller.*;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

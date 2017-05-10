@@ -1,8 +1,7 @@
 package servlet.controller;
 
-import counterrecord.Utils;
-import counterrecord.VirtCpuInfo;
-import counterrecord.VirtDiskIoInfo;
+import counter_record.Utils;
+import counter_record.VirtDiskIoInfo;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import servlet.Error;

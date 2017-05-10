@@ -1,13 +1,6 @@
-package counterrecord;
-
-import config.Config;
+package counter_record;
 
 import java.nio.ByteBuffer;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.List;
 
 public class Utils {
     public static String getString(ByteBuffer buffer,  int max_len) throws Exception {

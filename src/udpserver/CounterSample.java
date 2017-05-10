@@ -1,10 +1,10 @@
 package udpserver;
 
 import config.Config;
-import counterrecord.HostDescription;
+import counter_record.HostDescription;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
-import counterrecord.*;
+import counter_record.*;
 
 public class CounterSample implements SFlowSample {
     private static final int HOST_DESCRIPTION_TYPE = 0X0 | 2000;

@@ -1,13 +1,10 @@
 package servlet.controller;
 
-import counterrecord.HostDescription;
+import counter_record.HostDescription;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 

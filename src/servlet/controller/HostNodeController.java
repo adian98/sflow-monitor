@@ -1,10 +1,8 @@
 package servlet.controller;
 
 
-import counterrecord.HostDescription;
-import counterrecord.HostNetIoInfo;
-import counterrecord.HostNodeInfo;
-import counterrecord.Utils;
+import counter_record.HostNodeInfo;
+import counter_record.Utils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import servlet.Error;
