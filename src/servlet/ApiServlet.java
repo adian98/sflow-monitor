@@ -60,6 +60,9 @@ public class ApiServlet extends HttpServlet {
             case "host.cpu":
                 controller = new HostCpuController(params, id);
                 break;
+            case "host.disk":
+                controller = new HostDiskController(params, id);
+                break;
 
 
             default: {

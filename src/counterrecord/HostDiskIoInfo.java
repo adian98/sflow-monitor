@@ -5,7 +5,10 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HostDiskIoInfo extends HostCounterRecord {
     private long  disk_total;     /* total disk size in bytes */
@@ -95,5 +98,35 @@ public class HostDiskIoInfo extends HostCounterRecord {
         pstmt.setLong(11, write_time);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+        String sql = "SELECT * FROM host_disk_io WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("disk_total", rs.getLong("disk_total"));
+            map.put("disk_free", rs.getLong("disk_free"));
+            map.put("part_max_used", rs.getFloat("part_max_used"));
+            map.put("reads", rs.getLong("reads"));
+            map.put("bytes_read", rs.getLong("bytes_read"));
+            map.put("read_time", rs.getLong("read_time"));
+            map.put("writes", rs.getLong("writes"));
+            map.put("bytes_written", rs.getLong("bytes_written"));
+            map.put("write_time", rs.getLong("write_time"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }
