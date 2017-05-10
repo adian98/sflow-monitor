@@ -19,18 +19,10 @@ public class HostDescriptionController extends AbstractController {
 
     @Override
     protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, ServletException {
-        List<HashMap> list;
-        try {
-            list = HostDescription.fromDb();
-            JSONArray jsonArray = JSONArray.fromObject(list);
-            Result result = new Result(jsonArray.toString(2), id);
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        return null;
+            throws Exception {
+        List<HashMap> list = HostDescription.fromDb();
+        JSONArray jsonArray = JSONArray.fromObject(list);
+        Result result = new Result(jsonArray.toString(2), id);
+        return result;
     }
 }

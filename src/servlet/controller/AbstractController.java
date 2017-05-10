@@ -22,21 +22,28 @@ public class AbstractController {
     }
 
     protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException, ServletException {
+            throws Exception{
         Config.LOG_ERROR("not implement");
         return null;
     }
 
     public void handle(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
+
+        String jsp_path = null;
         try {
             result = doHandle(req, resp);
             req.setAttribute("result", result);
-            RequestDispatcher rd = req.getRequestDispatcher("result.jsp");
-            rd.forward(req, resp);
+            jsp_path = "result.jsp";
+;
         } catch (Exception e) {
             e.printStackTrace();
+            Config.LOG_ERROR("handl req error %s", e.getMessage());
+            jsp_path = "server_error.jsp";
         }
+
+        RequestDispatcher rd = req.getRequestDispatcher(jsp_path);
+        rd.forward(req, resp);
     }
 
 }
