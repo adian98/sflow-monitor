@@ -22,7 +22,6 @@ public class HostDescriptionController extends AbstractController {
             throws Exception {
         List<HashMap> list = HostDescription.fromDb();
         JSONArray jsonArray = JSONArray.fromObject(list);
-        Result result = new Result(jsonArray.toString(2), id);
-        return result;
+        return new Result(jsonArray.toString(2), id);
     }
 }

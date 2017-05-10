@@ -5,6 +5,7 @@ import net.sf.json.JSONObject;
 import servlet.controller.AbstractController;
 import servlet.controller.AddController;
 import servlet.controller.HostDescriptionController;
+import servlet.controller.HostNodeController;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -30,8 +31,7 @@ public class ApiServlet extends HttpServlet {
             body = getBody(req);
         } catch (Exception e) {
             Config.LOG_ERROR("get body error %s", e.getMessage());
-            RequestDispatcher rd = req.getRequestDispatcher("invalid_json.jsp");
-            rd.forward(req, resp);
+            Error.invalidJson(req, resp);
             return;
         }
         String method;
@@ -42,9 +42,8 @@ public class ApiServlet extends HttpServlet {
             id = body.getString("id");
             params = body.get("params");
         } catch (Exception e) {
-            Config.LOG_ERROR("get method error %s", e.getMessage());
-            RequestDispatcher rd = req.getRequestDispatcher("invalid_request.jsp");
-            rd.forward(req, resp);
+            Config.LOG_ERROR("invalid request error %s", e.getMessage());
+            Error.invalidRequest(req, resp);
             return;
         }
 
@@ -58,11 +57,14 @@ public class ApiServlet extends HttpServlet {
             case "host.description":
                 controller = new HostDescriptionController(params, id);
                 break;
+            case "host.node":
+                controller = new HostNodeController(params, id);
+                break;
 
 
             default: {
                 Config.LOG_ERROR("invalid mothod");
-                req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
+                Error.invalidMethod(req, resp);
                 return;
             }
         }

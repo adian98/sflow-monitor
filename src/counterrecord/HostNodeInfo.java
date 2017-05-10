@@ -3,7 +3,11 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HostNodeInfo extends HostCounterRecord {
     private long vnode_mhz;          /* expected CPU frequency */
@@ -72,5 +76,35 @@ public class HostNodeInfo extends HostCounterRecord {
         pstmt.setLong(7, vnode_num_domains);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT host_ip, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains" +
+                     " FROM host_node WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("vnode_mhz", rs.getLong("vnode_mhz"));
+            map.put("vnode_cpus", rs.getLong("vnode_cpus"));
+            map.put("vnode_memory", rs.getLong("vnode_memory"));
+            map.put("vnode_memory_free", rs.getLong("vnode_memory_free"));
+            map.put("vnode_num_domains", rs.getLong("vnode_num_domains"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

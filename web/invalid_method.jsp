@@ -11,6 +11,5 @@
             out.print(id);
         } else {
             out.print("\"" + id + "\"");
-        }
-        %>
+        } %>
 }

@@ -1,5 +1,10 @@
 package servlet;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 public class Error {
     public static final int PARSE_ERROR = -32700;
     public static final int INVALID_REQUEST = -32600;
@@ -24,4 +29,23 @@ public class Error {
                 return "Other error";
         }
     }
+
+    static public void invalidMethod(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+        req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
+    }
+
+    static public void invalidRequest(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+        req.getRequestDispatcher("invalid_request.jsp").forward(req, resp);
+    }
+
+
+    static public void invalidJson(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+        req.getRequestDispatcher("invalid_json.jsp").forward(req, resp);
+    }
+
+
+
 }

@@ -46,4 +46,15 @@ public class Utils {
         buf.flip();
         return buf.getLong();
     }
+
+    public static long tenMinutes() {
+        //in milliseconds
+        return 10 * 60 * 1000;
+    }
+
+    public static long timeNow() {
+        //in milliseconds
+        return System.currentTimeMillis();
+    }
+
 }
