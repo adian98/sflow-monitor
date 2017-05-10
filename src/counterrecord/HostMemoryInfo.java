@@ -4,7 +4,10 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HostMemoryInfo extends HostCounterRecord {
     private long mem_total;   /* total bytes */
@@ -106,5 +109,38 @@ public class HostMemoryInfo extends HostCounterRecord {
         pstmt.setLong(13, swap_out);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+
+    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+        String sql = "SELECT * FROM host_memory WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("mem_total", rs.getLong("mem_total"));
+            map.put("mem_free", rs.getLong("mem_free"));
+            map.put("mem_shared", rs.getLong("mem_shared"));
+            map.put("mem_buffers", rs.getLong("mem_buffers"));
+            map.put("mem_cached", rs.getLong("mem_cached"));
+            map.put("swap_total", rs.getLong("swap_total"));
+            map.put("swap_free", rs.getLong("swap_free"));
+            map.put("page_in", rs.getLong("page_in"));
+            map.put("page_out", rs.getLong("page_out"));
+            map.put("swap_in", rs.getLong("swap_in"));
+            map.put("swap_out", rs.getLong("swap_out"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

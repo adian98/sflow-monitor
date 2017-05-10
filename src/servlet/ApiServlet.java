@@ -64,6 +64,9 @@ public class ApiServlet extends HttpServlet {
                 controller = new HostDiskController(params, id);
                 break;
 
+            case "host.memory":
+                controller = new HostMemoryController(params, id);
+                break;
 
             default: {
                 Config.LOG_ERROR("invalid mothod");
