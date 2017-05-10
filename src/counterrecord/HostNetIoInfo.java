@@ -55,7 +55,7 @@ public class HostNetIoInfo extends HostCounterRecord {
     }
 
     static public String schema() {
-        return "CREATE TABLE host_net (" +
+        return "CREATE TABLE host_net_io (" +
                 "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
                 "bytes_in INTEGER, " +
@@ -73,7 +73,7 @@ public class HostNetIoInfo extends HostCounterRecord {
     public void saveToDb() throws Exception {
         Connection conn = Config.getJdbcConnection();
 
-        String sql = "INSERT INTO host_net " +
+        String sql = "INSERT INTO host_net_io " +
                 "(host_ip, timestamp, bytes_in, packets_in, errs_in, drops_in, " +
                 "bytes_out, packets_out, errs_out, drops_out) " +
                 "VALUES(?,?,?,?,?,?,?,?,?,?)";

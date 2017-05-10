@@ -9,15 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AddController extends AbstractController {
+    //just for test
 
     public AddController(Object params, String id) {
         super(params, id);
     }
 
     @Override
-    protected Result do_handle(HttpServletRequest req, HttpServletResponse resp)
+    protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-
         JSONObject jsonObject = JSONObject.fromObject(params);
         int x = jsonObject.getInt("x");
         int y = jsonObject.getInt("y");

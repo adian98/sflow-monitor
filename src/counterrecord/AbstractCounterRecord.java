@@ -19,6 +19,10 @@ class AbstractCounterRecord {
         buffer = ByteBuffer.wrap(bytes);
     }
 
+    protected AbstractCounterRecord() {
+        //do nothing
+    }
+
     public void decode() throws Exception {
         Config.LOG_ERROR("not implement method");
     }

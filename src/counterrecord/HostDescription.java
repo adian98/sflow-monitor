@@ -3,8 +3,10 @@ import config.Config;
 
 import java.nio.ByteBuffer;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 
 public class HostDescription extends HostCounterRecord {
@@ -18,6 +20,10 @@ public class HostDescription extends HostCounterRecord {
 
     private HostDescription(byte[] bytes, String host_ip, long timestamp) {
         super(bytes, host_ip, timestamp);
+    }
+
+    private HostDescription() {
+        super();
     }
 
     static public HostDescription fromBytes(byte[] bytes, String host_ip, long timestamp)
@@ -243,6 +249,26 @@ public class HostDescription extends HostCounterRecord {
             }
         }
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb() throws Exception {
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+        String sql = "SELECT host_ip, hostname, machine_type, os_name, os_release FROM host_description;";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("hostname", rs.getString("hostname"));
+            map.put("machine_type", rs.getString("machine_type"));
+            map.put("os_name", rs.getString("os_name"));
+            map.put("os_release", rs.getString("os_release"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 
 

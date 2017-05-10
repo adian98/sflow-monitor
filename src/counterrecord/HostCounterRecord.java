@@ -7,4 +7,7 @@ public class HostCounterRecord extends AbstractCounterRecord {
         super(bytes, host_ip, timestamp);
     }
 
+    protected HostCounterRecord() {
+        super();
+    }
 }

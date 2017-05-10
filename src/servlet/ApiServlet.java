@@ -4,6 +4,7 @@ import config.Config;
 import net.sf.json.JSONObject;
 import servlet.controller.AbstractController;
 import servlet.controller.AddController;
+import servlet.controller.HostDescriptionController;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -47,15 +48,20 @@ public class ApiServlet extends HttpServlet {
             return;
         }
 
+        req.setAttribute("id", id);
+
         AbstractController controller = null;
         switch (method) {
             case "add":
                 controller = new AddController(params, id);
                 break;
+            case "host.description":
+                controller = new HostDescriptionController(params, id);
+                break;
 
 
             default: {
-                Config.LOG_ERROR("invalid ");
+                Config.LOG_ERROR("invalid mothod");
                 req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
                 return;
             }
@@ -65,8 +71,7 @@ public class ApiServlet extends HttpServlet {
             controller.handle(req, resp);
         } catch (Exception e) {
             Config.LOG_ERROR("controller handler error %s", e.getMessage());
-            //req.setAttribute("id", id);
-            req.getRequestDispatcher("invalid_method.jsp").forward(req, resp);
+            req.getRequestDispatcher("server_error.jsp").forward(req, resp);
         }
     }
 
