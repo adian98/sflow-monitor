@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class HostCpuInfo extends HostCounterRecord {
@@ -157,7 +158,7 @@ public class HostCpuInfo extends HostCounterRecord {
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("host_ip", rs.getString("host_ip"));
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("cpu_load_one", rs.getFloat("cpu_load_one"));

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class HostNodeInfo extends HostCounterRecord {
@@ -93,7 +94,7 @@ public class HostNodeInfo extends HostCounterRecord {
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new LinkedHashMap<String, Object>();
             map.put("host_ip", rs.getString("host_ip"));
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("vnode_mhz", rs.getLong("vnode_mhz"));

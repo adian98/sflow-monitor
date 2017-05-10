@@ -72,6 +72,9 @@ public class ApiServlet extends HttpServlet {
             case "virt.description":
                 controller = new VirtDescriptionController(params, id);
                 break;
+            case "virt.cpu":
+                controller = new VirtCpuController(params, id);
+                break;
             default: {
                 Config.LOG_ERROR("invalid mothod");
                 Error.invalidMethod(req, resp);

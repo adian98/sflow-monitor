@@ -10,7 +10,6 @@ class TestHostCpu(unittest.TestCase):
 
     def test_success(self):
         ret = self.server.host.cpu(ip="10.12.25.25", timestamp = config.now)
-        print(json.dumps(ret, indent=2))
 
 
     def test_no_timestamp(self):
@@ -27,6 +26,7 @@ class TestHostCpu(unittest.TestCase):
 
         with self.assertRaises(Exception):
             ret = self.server.host.cpu(ipp="10.12.25.25", timestamp = config.now)
+
 
 if __name__ =='__main__':
     unittest.main()

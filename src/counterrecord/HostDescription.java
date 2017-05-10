@@ -3,10 +3,7 @@ import config.Config;
 
 import java.nio.ByteBuffer;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 
 public class HostDescription extends HostCounterRecord {
@@ -259,7 +256,7 @@ public class HostDescription extends HostCounterRecord {
         ResultSet rs = stmt.executeQuery(sql);
 
         while (rs.next()) {
-            HashMap<String, String> map = new HashMap<String, String>();
+            HashMap<String, String> map = new LinkedHashMap<String, String>();
             map.put("host_ip", rs.getString("host_ip"));
             map.put("hostname", rs.getString("hostname"));
             map.put("machine_type", rs.getString("machine_type"));
