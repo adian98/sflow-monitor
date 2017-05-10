@@ -2,10 +2,7 @@ package servlet;
 
 import config.Config;
 import net.sf.json.JSONObject;
-import servlet.controller.AbstractController;
-import servlet.controller.AddController;
-import servlet.controller.HostDescriptionController;
-import servlet.controller.HostNodeController;
+import servlet.controller.*;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -59,6 +56,9 @@ public class ApiServlet extends HttpServlet {
                 break;
             case "host.node":
                 controller = new HostNodeController(params, id);
+                break;
+            case "host.cpu":
+                controller = new HostCpuController(params, id);
                 break;
 
 

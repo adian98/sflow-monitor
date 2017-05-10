@@ -84,8 +84,7 @@ public class HostNodeInfo extends HostCounterRecord {
         List<HashMap> list = new ArrayList<HashMap>();
         Connection conn = Config.getJdbcConnection();
 
-        String sql = "SELECT host_ip, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains" +
-                     " FROM host_node WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        String sql = "SELECT * FROM host_node WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);

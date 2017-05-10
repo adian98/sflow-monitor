@@ -4,7 +4,10 @@ import config.Config;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class HostCpuInfo extends HostCounterRecord {
 
@@ -137,5 +140,46 @@ public class HostCpuInfo extends HostCounterRecord {
         pstmt.setLong(19, cpu_contexts);
         pstmt.executeUpdate();
         Config.putJdbcConnection(conn);
+    }
+
+    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+        Long start = timestamp - Utils.tenMinutes();
+
+        List<HashMap> list = new ArrayList<HashMap>();
+        Connection conn = Config.getJdbcConnection();
+
+        String sql = "SELECT * FROM host_cpu WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, host_ip);
+        pstmt.setLong(2, start);
+        pstmt.setLong(3, timestamp);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("host_ip", rs.getString("host_ip"));
+            map.put("timestamp", rs.getLong("timestamp"));
+            map.put("cpu_load_one", rs.getFloat("cpu_load_one"));
+            map.put("cpu_load_five", rs.getFloat("cpu_load_five"));
+            map.put("cpu_load_fifteen", rs.getFloat("cpu_load_fifteen"));
+            map.put("cpu_proc_run", rs.getLong("cpu_proc_run"));
+            map.put("cpu_proc_total", rs.getLong("cpu_proc_total"));
+            map.put("cpu_num", rs.getLong("cpu_num"));
+            map.put("cpu_speed", rs.getLong("cpu_speed"));
+            map.put("cpu_uptime", rs.getLong("cpu_uptime"));
+            map.put("cpu_user", rs.getLong("cpu_user"));
+            map.put("cpu_nice", rs.getLong("cpu_nice"));
+            map.put("cpu_system", rs.getLong("cpu_system"));
+            map.put("cpu_idle", rs.getLong("cpu_idle"));
+            map.put("cpu_waiting_io", rs.getLong("cpu_waiting_io"));
+            map.put("cpu_intr", rs.getLong("cpu_intr"));
+            map.put("cpu_sintr", rs.getLong("cpu_sintr"));
+            map.put("cpu_interrupts", rs.getLong("cpu_interrupts"));
+            map.put("cpu_contexts", rs.getLong("cpu_contexts"));
+            list.add(map);
+        }
+        Config.putJdbcConnection(conn);
+        return list;
     }
 }

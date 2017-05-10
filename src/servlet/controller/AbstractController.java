@@ -17,15 +17,6 @@ public class AbstractController {
     protected Result result;
     protected boolean is_commited;
 
-
-    protected boolean isCommited() {
-        return is_commited;
-    }
-
-    protected void setCommited() {
-        is_commited = true;
-    }
-
     public AbstractController(Object params, String id) {
         this.params = params;
         this.id = id;
@@ -50,7 +41,6 @@ public class AbstractController {
 
             req.setAttribute("result", result);
             jsp_path = "result.jsp";
-;
         } catch (Exception e) {
             e.printStackTrace();
             Config.LOG_ERROR("handl req error %s", e.getMessage());
@@ -59,6 +49,15 @@ public class AbstractController {
 
         RequestDispatcher rd = req.getRequestDispatcher(jsp_path);
         rd.forward(req, resp);
+    }
+
+
+    protected boolean isCommited() {
+        return is_commited;
+    }
+
+    protected void setCommited() {
+        is_commited = true;
     }
 
 }

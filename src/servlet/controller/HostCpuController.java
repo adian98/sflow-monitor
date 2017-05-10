@@ -1,8 +1,7 @@
 package servlet.controller;
 
 
-import counterrecord.HostDescription;
-import counterrecord.HostNetIoInfo;
+import counterrecord.HostCpuInfo;
 import counterrecord.HostNodeInfo;
 import counterrecord.Utils;
 import net.sf.json.JSONArray;
@@ -14,15 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 
-public class HostNodeController extends AbstractController{
-
-    public HostNodeController(Object params, String id) {
+public class HostCpuController extends AbstractController {
+    public HostCpuController (Object params, String id) {
         super(params, id);
     }
 
     @Override
-    protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
-            throws Exception {
+    protected Result doHandle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if (params == null) {
             Error.invalidRequest(req, resp);
             setCommited();
@@ -45,7 +42,7 @@ public class HostNodeController extends AbstractController{
             timestamp = Utils.timeNow();
         }
 
-        List<HashMap> list = HostNodeInfo.fromDb(host_ip, timestamp);
+        List<HashMap> list = HostCpuInfo.fromDb(host_ip, timestamp);
         JSONArray jsonArray = JSONArray.fromObject(list);
         return new Result(jsonArray.toString(2), id);
     }
