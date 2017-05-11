@@ -1,4 +1,4 @@
-host.cpu
+host.disk
 ----------------
 
 
@@ -20,7 +20,7 @@ array:
 
 |     Key        | Type |                                             Description                                 |
 |----------------|------|-----------------------------------------------------------------------------------------|
-|host_ip         |string|empty if unknown|
+|host_ip         |string|ip|
 |timestamp       |long  |timestamp|
 |disk_total      |long  |total disk size in bytes|
 |disk_free       |long  |total disk free in bytes|

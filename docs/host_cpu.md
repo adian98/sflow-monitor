@@ -20,7 +20,7 @@ array:
 
 |     Key        | Type |                                             Description                                 |
 |----------------|------|-----------------------------------------------------------------------------------------|
-|host_ip         |string|empty if unknown|
+|host_ip         |string|ip|
 |timestamp       |long  |timestamp|
 |cpu_load_one    |float |1 minute load avg., -1.0 = unknown|
 |cpu_load_five   |float |5 minute load avg., -1.0 = unknown|
