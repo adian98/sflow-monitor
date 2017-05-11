@@ -16,7 +16,7 @@ class TestFail(unittest.TestCase):
         print("json error : {0}".format(r.json()))
 
     def test_invalid_request(self):
-        data = '{"jsonrpc": "2.0", "method": 1, "params": "bar"}'
+        data = '{"jsonrpc": "2.0", "method": "foobar", "params": "bar"}'
         r = requests.post(config.url, data=data)
         print("request error : {0}".format(r.json()))
 

@@ -11,6 +11,7 @@ JSON-RPC specification, see:[http://json-rpc.org/wiki/specification](http://json
 [API](/docs/api.md)
 ----
 
+####Performing requests
 Once you've set up the servlet, you can use remote HTTP requests to call the [API](/docs/api.md). 
 To do that you need to send HTTP POST requests to the `/api`. For example, if your `sflow-monitor` is installed under `http://localhost:8080/sflow-monitor`, 
 the HTTP request to call the `host.description` method may look like this:
@@ -30,7 +31,6 @@ Let's take a closer look at the request object. It has the following properties:
 * `method` - the API method being called;
 * `params` - parameters that will be passed to the API method;
 id - an arbitrary identifier of the request;
-
 
 If you provided the credentials correctly, the response returned by the [API](/docs/api.md) will contain the host description token: 
 
@@ -61,3 +61,51 @@ The response object in turn contains the following properties:
 * `result` - the data returned by the method;
 * `id` - identifier of the corresponding request
     
+####Error handling
+rpc call of non-existent method:
+
+    --> {"jsonrpc": "2.0", "method": "foobar", "id": "1"}
+    <-- {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": 1}
+    
+rpc call with invalid JSON:
+
+    --> {"jsonrpc": "2.0", "method": "foobar, "params": "bar", "baz]
+    <-- {"jsonrpc": "2.0", "error": {"code": -32700,"message": "Parse error"}, "id": null}
+    
+rpc call with invalid Request object:
+
+    --> {"jsonrpc": "2.0", "method": "foobar", "params": "bar"}
+    <-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}
+    
+####Performing requests using json-rpc
+This is obviously taken from a console session:
+
+    python3
+    >>> server = jsonrpclib.ServerProxy('http://localhost:8080/api')
+    >>> server.virt.memory(hostname = '1ff5a54e-c885-4153-9005-f42478261ada')
+       
+    {
+      "jsonrpc": "2.0",
+      "result": [
+        {
+        "host_ip": "10.12.25.25",
+        "timestamp": 1494484658661,
+        "hostname": "1ff5a54e-c885-4153-9005-f42478261ada",
+        "vmem_memory": 8589934592,
+        "vmem_max_memory": 8589934592
+      },
+        {
+        "host_ip": "10.12.25.25",
+        "timestamp": 1494484694732,
+        "hostname": "1ff5a54e-c885-4153-9005-f42478261ada",
+        "vmem_memory": 8589934592,
+        "vmem_max_memory": 8589934592
+      },
+      ...
+    ],
+      "id": "34bf7218-d5ba-4b60-b4f3-31dd3071c534"
+    }
+    
+
+
+
