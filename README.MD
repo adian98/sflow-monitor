@@ -18,6 +18,7 @@ the HTTP request to call the `host.description` method may look like this:
 
     POST http://localhost:8080/sflow-monitor/api HTTP/1.1
     Content-Type: application/json-rpc
+      
     {
       "jsonrpc":"2.0",
       "method":"host.description",
