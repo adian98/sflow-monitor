@@ -14,13 +14,14 @@ none
 
 array:
 
-*  `host_ip` - ip, type : string
-*  `hostname` - hostname, empty if unknown, type : string
-*  `machine_type` - the processor family, type : string
-*  `os_name` - Operating system, type, type : string
-*  `os_release` - e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown, type : string
 
-
+|     Key        | Type |                                             Description                                 |
+|----------------|------|-----------------------------------------------------------------------------------------|
+|host_ip         |string|ip|
+|hostname        |string|hostname|
+|machine_type    |string|the processor family|
+|os_name         |string|Operating system|
+|os_release      |string|e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown|
 
 #### Examples
 
@@ -56,9 +57,3 @@ Response:
     ],
       "id": 1
     }
-
-
-
-    
-
-
