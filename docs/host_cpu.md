@@ -8,19 +8,18 @@ host.cpu
 
 #### Parameters
 
-* `ip` - 必填, 节点IP
-* `timestamp` - 可选， UNIX 时间戳(milliseconds), 返回该时间戳及10分钟之前的所有信息，如果不制定默认为当前时间
+
+|Parameter|Required|  Type  |                             Description                                      |
+|---------|:------:|:------:|:----------------------------------------------------------------------------:|
+|   ip    |  true  | string | 节点IP  |
+|timestamp| false  | long   |UNIX 时间戳(milliseconds), 返回该时间戳及10分钟之前的所有信息，如果不制定默认为当前时间|
 
 #### Return values
 
 array:
 
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+
 
 
 
