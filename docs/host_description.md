@@ -14,11 +14,11 @@ none
 
 array:
 
-*  `host_ip` - ip
-*  `hostname` - hostname, empty if unknown, type
-*  `machine_type` - the processor family
-*  `os_name` - Operating system, type
-*  `os_release` - e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown
+*  `host_ip` - ip, type : string
+*  `hostname` - hostname, empty if unknown, type : string
+*  `machine_type` - the processor family, type : string
+*  `os_name` - Operating system, type, type : string
+*  `os_release` - e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown, type : string
 
 
 
