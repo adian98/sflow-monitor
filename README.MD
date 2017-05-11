@@ -81,6 +81,7 @@ rpc call with invalid Request object:
 This is obviously taken from a console session:
 
     python3
+    >>> import jsonrpclib
     >>> server = jsonrpclib.ServerProxy('http://localhost:8080/api')
     >>> server.virt.memory(hostname = '1ff5a54e-c885-4153-9005-f42478261ada')
        
