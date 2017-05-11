@@ -11,7 +11,7 @@ JSON-RPC specification, see:[http://json-rpc.org/wiki/specification](http://json
 [API](/docs/api.md)
 ----
 
-####Performing requests
+#### Performing requests
 Once you've set up the servlet, you can use remote HTTP requests to call the [API](/docs/api.md). 
 To do that you need to send HTTP POST requests to the `/api`. For example, if your `sflow-monitor` is installed under `http://localhost:8080/sflow-monitor`, 
 the HTTP request to call the `host.description` method may look like this:
@@ -61,7 +61,8 @@ The response object in turn contains the following properties:
 * `result` - the data returned by the method;
 * `id` - identifier of the corresponding request
     
-####Error handling
+#### Error handling
+
 rpc call of non-existent method:
 
     --> {"jsonrpc": "2.0", "method": "foobar", "id": "1"}
@@ -77,7 +78,7 @@ rpc call with invalid Request object:
     --> {"jsonrpc": "2.0", "method": "foobar", "params": "bar"}
     <-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}
     
-####Performing requests using json-rpc
+#### Performing requests using json-rpc
 This is obviously taken from a console session:
 
     python3
