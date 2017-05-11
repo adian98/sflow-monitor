@@ -1,3 +1,4 @@
+from add import TestAdd
 from host_cpu import TestHostCpu
 from host_node import TestNode
 from host_net import TestNode

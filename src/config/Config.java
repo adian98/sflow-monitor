@@ -2,6 +2,7 @@ package config;
 
 import db.ConnectionPool;
 
+import java.io.File;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,6 +29,7 @@ class LogFormatter extends Formatter {
 public class Config {
     private Logger logger = Logger.getLogger("sflow-monitor");
     private ConnectionPool connectionPool = new ConnectionPool(10);
+    private String db_path;
 
     //singleton
     static Config config;
@@ -45,14 +47,23 @@ public class Config {
     private Config() {
         //defaut
         logger.setLevel(Level.ALL);
+        //create folder
+        String path = System.getProperty("user.home") + "/sflow-monitor";
+        File folder = new File(path);
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
 
         try {
-            FileHandler handler = new FileHandler("/tmp/text.log");
+            String log_path = path + "/sflow-monitor-" + System.currentTimeMillis() + ".log";
+            FileHandler handler = new FileHandler(log_path);
             handler.setFormatter(new LogFormatter());
             logger.addHandler(handler);
         } catch (Exception e) {
             logger.warning("add file handler error");
         }
+
+        db_path = "jdbc:sqlite:" + path + "/sflow-monitor.db";
     }
 
     static public void LOG_INFO(String format, Object ... objects) {
@@ -74,6 +85,6 @@ public class Config {
     }
 
     static public String dbPath() {
-        return "jdbc:sqlite:/tmp/db.db";
+        return config.db_path;
     }
 }
