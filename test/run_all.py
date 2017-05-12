@@ -11,6 +11,8 @@ from virt_disk import TestVirtDisk
 from virt_cpu_info import TestVirtCpu
 
 import unittest
+import sys
+import config
 
 
 if __name__ == '__main__':

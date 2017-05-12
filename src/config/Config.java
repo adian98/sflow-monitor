@@ -55,7 +55,7 @@ public class Config {
         }
 
         try {
-            String log_path = path + "/sflow-monitor-" + System.currentTimeMillis() + ".log";
+            String log_path = path + "/sflow-monitor.log";
             FileHandler handler = new FileHandler(log_path);
             handler.setFormatter(new LogFormatter());
             logger.addHandler(handler);

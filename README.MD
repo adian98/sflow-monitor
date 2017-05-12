@@ -8,6 +8,10 @@ sFlow data format, see:[http://www.sflow.org](http://www.sflow.org)
 
 JSON-RPC specification, see:[http://json-rpc.org/wiki/specification](http://json-rpc.org/wiki/specification)
 
+[configure tomcat](/docs/configure_tomcat.md)
+
+[configure host-sflow](/docs/configure_host_flow.md)
+
 [API](/docs/api.md)
 ----
 
@@ -108,6 +112,7 @@ This is obviously taken from a console session:
     ],
       "id": "34bf7218-d5ba-4b60-b4f3-31dd3071c534"
     }
+    
     
 
 
