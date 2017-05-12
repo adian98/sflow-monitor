@@ -1,8 +1,9 @@
 package counter_record;
-import config.Config;
+import log.LOG;
 import net.sf.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -23,7 +24,7 @@ class AbstractCounterRecord {
     }
 
     public void decode() throws Exception {
-        Config.LOG_ERROR("not implement method");
+        LOG.ERROR("not implement method");
     }
 
     protected HashMap<String, Object> getMap() {
@@ -39,8 +40,8 @@ class AbstractCounterRecord {
         return jsonObject.toString(2);
     }
 
-    public void saveToDb() throws Exception {
-        Config.LOG_ERROR("not implement method");
+    public void saveToDb(Connection conn) throws Exception {
+        LOG.ERROR("not implement method");
     }
 
 }

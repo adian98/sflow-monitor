@@ -1,7 +1,7 @@
 package counter_record;
 
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -78,8 +78,7 @@ public class HostDiskIoInfo extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
+    public void saveToDb(Connection conn) throws Exception {
 
         String sql = "INSERT INTO host_disk_io " +
                 "(host_ip, timestamp, disk_total, disk_free, part_max_used, " +
@@ -98,15 +97,14 @@ public class HostDiskIoInfo extends HostCounterRecord {
         pstmt.setLong(10, bytes_written);
         pstmt.setLong(11, write_time);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+    static public void fromDb(String host_ip, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
+
         String sql = "SELECT * FROM host_disk_io WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -127,7 +125,5 @@ public class HostDiskIoInfo extends HostCounterRecord {
             map.put("write_time", rs.getLong("write_time"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,9 +51,7 @@ public class VirtMemoryInfo extends VirtCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO virt_memory " +
                 "(host_ip, timestamp, hostname, vmem_memory, vmem_max_memory)" +
                 "VALUES(?,?,?,?,?);";
@@ -64,18 +62,15 @@ public class VirtMemoryInfo extends VirtCounterRecord {
         pstmt.setLong(4, vmem_memory);
         pstmt.setLong(5, vmem_max_memory);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+    static public void fromDb(String hostname, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM virt_memory WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, hostname);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -90,7 +85,5 @@ public class VirtMemoryInfo extends VirtCounterRecord {
             map.put("vmem_max_memory", rs.getLong("vmem_max_memory"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

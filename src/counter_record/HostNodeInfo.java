@@ -1,5 +1,6 @@
 package counter_record;
-import config.Config;
+
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -60,9 +61,7 @@ public class HostNodeInfo extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO host_node " +
                 "(host_ip, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
                 "VALUES(?,?,?,?,?,?,?);";
@@ -75,18 +74,14 @@ public class HostNodeInfo extends HostCounterRecord {
         pstmt.setLong(6, vnode_memory_free);
         pstmt.setLong(7, vnode_num_domains);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+    static public void fromDb(String host_ip, Long timestamp, List<HashMap> list) throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM host_node WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -103,7 +98,5 @@ public class HostNodeInfo extends HostCounterRecord {
             map.put("vnode_num_domains", rs.getLong("vnode_num_domains"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

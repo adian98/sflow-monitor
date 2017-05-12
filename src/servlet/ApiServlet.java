@@ -1,6 +1,6 @@
 package servlet;
 
-import config.Config;
+import log.LOG;
 import net.sf.json.JSONObject;
 import servlet.controller.*;
 
@@ -26,7 +26,7 @@ public class ApiServlet extends HttpServlet {
         try {
             body = getBody(req);
         } catch (Exception e) {
-            Config.LOG_ERROR("get body error %s", e.getMessage());
+            LOG.ERROR("get body error %s", e.getMessage());
             Error.invalidJson(req, resp);
             return;
         }
@@ -38,7 +38,7 @@ public class ApiServlet extends HttpServlet {
             id = body.getString("id");
             params = body.get("params");
         } catch (Exception e) {
-            Config.LOG_ERROR("invalid request error %s", e.getMessage());
+            LOG.ERROR("invalid request error %s", e.getMessage());
             Error.invalidRequest(req, resp);
             return;
         }
@@ -84,7 +84,7 @@ public class ApiServlet extends HttpServlet {
                 controller = new VirtNetController(params, id);
                 break;
             default: {
-                Config.LOG_ERROR("invalid mothod");
+                LOG.ERROR("invalid mothod");
                 Error.invalidMethod(req, resp);
                 return;
             }
@@ -93,7 +93,8 @@ public class ApiServlet extends HttpServlet {
         try {
             controller.handle(req, resp);
         } catch (Exception e) {
-            Config.LOG_ERROR("controller handler error %s", e.getMessage());
+            e.printStackTrace();
+            LOG.ERROR("controller handler error %s", e.getMessage());
             req.getRequestDispatcher("server_error.jsp").forward(req, resp);
         }
     }
@@ -110,7 +111,7 @@ public class ApiServlet extends HttpServlet {
             out.append(new String(bytes,0, n));
         }
         String body = out.toString();
-        Config.LOG_INFO("body = %s", body);
+        LOG.INFO("body = %s", body);
         return JSONObject.fromObject(body);
     }
 }

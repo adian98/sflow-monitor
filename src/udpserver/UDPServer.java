@@ -1,6 +1,6 @@
 package udpserver;
 
-import config.Config;
+import log.LOG;
 
 import java.io.IOException;
 import java.net.*;
@@ -27,7 +27,7 @@ public class UDPServer implements Runnable{
             channel = DatagramChannel.open();
             channel.socket().bind(new InetSocketAddress(port));
         } catch (Exception e) {
-            Config.LOG_INFO(e.getMessage());
+            LOG.INFO(e.getMessage());
             return;
         }
 
@@ -40,16 +40,18 @@ public class UDPServer implements Runnable{
                 buf.flip();
 
             } catch (IOException e) {
-                Config.LOG_INFO(e.getMessage());
+                LOG.INFO(e.getMessage());
                 continue;
             }
 
             SFlowDatagram datagram = new SFlowDatagram(buf, socketAddress.getAddress());
 
             try {
-                datagram.process();
+                datagram.decode();
+                datagram.saveToDb();
             }catch (Exception e) {
-                Config.LOG_ERROR(e.getMessage());
+                e.printStackTrace();
+                LOG.ERROR(e.getMessage());
             }
         }
     }

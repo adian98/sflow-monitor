@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,9 +54,7 @@ public class VirtCpuInfo extends VirtCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO virt_cpu " +
                 "(host_ip, timestamp, hostname, vcpu_state, vcpu_cpu_time, vcpu_cpu_count) " +
                 "VALUES(?,?,?,?,?,?)";
@@ -68,18 +66,15 @@ public class VirtCpuInfo extends VirtCounterRecord {
         pstmt.setLong(5, vcpu_cpu_time);
         pstmt.setLong(6, vcpu_cpu_count);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+    static public void fromDb(String hostname, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM virt_cpu WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, hostname);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -95,7 +90,5 @@ public class VirtCpuInfo extends VirtCounterRecord {
             map.put("vcpu_cpu_count", rs.getLong("vcpu_cpu_count"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

@@ -1,7 +1,7 @@
 package servlet.controller;
 
 
-import config.Config;
+import log.LOG;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -25,7 +25,7 @@ public class AbstractController {
 
     protected Result doHandle(HttpServletRequest req, HttpServletResponse resp)
             throws Exception{
-        Config.LOG_ERROR("not implement");
+        LOG.ERROR("not implement");
         return null;
     }
 
@@ -43,7 +43,7 @@ public class AbstractController {
             jsp_path = "result.jsp";
         } catch (Exception e) {
             e.printStackTrace();
-            Config.LOG_ERROR("handl req error %s", e.getMessage());
+            LOG.ERROR("handl req error %s", e.getMessage());
             jsp_path = "server_error.jsp";
         }
 

@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -78,9 +78,7 @@ public class VirtNetIoInfo extends VirtCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO virt_net_io " +
                 "(host_ip, timestamp, hostname, vnio_bytes_in, vnio_packets_in, vnio_errs_in, vnio_drops_in, " +
                 "vnio_bytes_out, vnio_packets_out, vnio_errs_out, vnio_drops_out)" +
@@ -98,18 +96,15 @@ public class VirtNetIoInfo extends VirtCounterRecord {
         pstmt.setLong(10, vnio_errs_out);
         pstmt.setLong(11, vnio_drops_out);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+    static public void fromDb(String hostname, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM virt_net_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, hostname);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -130,7 +125,5 @@ public class VirtNetIoInfo extends VirtCounterRecord {
             map.put("vnio_drops_out", rs.getLong("vnio_drops_out"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

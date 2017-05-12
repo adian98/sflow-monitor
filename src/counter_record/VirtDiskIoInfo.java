@@ -1,5 +1,6 @@
 package counter_record;
-import config.Config;
+
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -75,8 +76,7 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
+    public void saveToDb(Connection conn) throws Exception {
 
         String sql = "INSERT INTO virt_disk_io " +
                 "(host_ip, timestamp, hostname, vdsk_capacity, vdsk_allocation, vdsk_available," +
@@ -95,18 +95,15 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
         pstmt.setLong(10, vdsk_wr_bytes);
         pstmt.setLong(11, vdsk_errs);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String hostname, Long timestamp) throws Exception {
+    static public void fromDb(String hostname, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM virt_disk_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, hostname);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -127,8 +124,6 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
             map.put("vdsk_errs", rs.getLong("vdsk_errs"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 
 }

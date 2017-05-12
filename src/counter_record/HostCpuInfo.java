@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -111,9 +111,7 @@ public class HostCpuInfo extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO host_cpu " +
                 "(host_ip, timestamp, cpu_load_one, cpu_load_five, cpu_load_fifteen, cpu_proc_run, " +
                 "cpu_proc_total, cpu_num, cpu_speed, cpu_uptime, cpu_user, cpu_nice, cpu_system, cpu_idle, " +
@@ -140,18 +138,15 @@ public class HostCpuInfo extends HostCounterRecord {
         pstmt.setLong(18, cpu_interrupts);
         pstmt.setLong(19, cpu_contexts);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+    static public void fromDb(String host_ip, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM host_cpu WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -180,7 +175,5 @@ public class HostCpuInfo extends HostCounterRecord {
             map.put("cpu_contexts", rs.getLong("cpu_contexts"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

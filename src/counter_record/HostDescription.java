@@ -1,6 +1,7 @@
 package counter_record;
-import config.Config;
 
+import db.DB;
+import log.LOG;
 import java.sql.*;
 import java.util.*;
 
@@ -178,22 +179,19 @@ public class HostDescription extends HostCounterRecord {
                 "os_release TEXT );";
     }
 
-    static public void loadFromDb() {
+    static public void loadFromDb(Connection conn) {
         nodeList = new HashSet<String>();
-        Connection conn;
         try {
-            conn = Config.getJdbcConnection();
-            String sql = "SELECT host_ip FROM host_description";
             Statement stmt = conn.createStatement();
+            String sql = "SELECT host_ip FROM host_description";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 nodeList.add(rs.getString("host_ip"));
             }
-
-            Config.putJdbcConnection(conn);
         } catch (Exception e) {
-            Config.LOG_ERROR(e.getMessage());
+            e.printStackTrace();
+            LOG.ERROR("load host description error ", e.getMessage());
         }
     }
 
@@ -202,9 +200,7 @@ public class HostDescription extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         if (HostDescription.contains(host_ip)) {
             String sql = "UPDATE host_description " +
                     "SET timestamp = ?, " +
@@ -240,18 +236,17 @@ public class HostDescription extends HostCounterRecord {
             pstmt.setString(7, os_release);
 
             pstmt.executeUpdate();
+
+            conn.commit();
             synchronized (nodeList) {
                 nodeList.add(host_ip);
             }
         }
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb() throws Exception {
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
+    static public void fromDb(List<HashMap> list) throws Exception {
         String sql = "SELECT host_ip, hostname, machine_type, os_name, os_release FROM host_description;";
-        Statement stmt = conn.createStatement();
+        Statement stmt = DB.db_conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
 
         while (rs.next()) {
@@ -263,8 +258,6 @@ public class HostDescription extends HostCounterRecord {
             map.put("os_release", rs.getString("os_release"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 
 

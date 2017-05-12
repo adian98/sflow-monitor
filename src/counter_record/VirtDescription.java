@@ -1,6 +1,7 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
+import log.LOG;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,11 +29,9 @@ public class VirtDescription extends VirtCounterRecord {
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip));";
     }
 
-    static public void loadFromDb() {
+    static public void loadFromDb(Connection conn) {
         virt_list = new HashSet<String>();
-        Connection conn;
         try {
-            conn = Config.getJdbcConnection();
             String sql = "SELECT hostname FROM virt_description";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -40,10 +39,8 @@ public class VirtDescription extends VirtCounterRecord {
             while (rs.next()) {
                 virt_list.add(rs.getString("hostname"));
             }
-
-            Config.putJdbcConnection(conn);
         } catch (Exception e) {
-            Config.LOG_ERROR(e.getMessage());
+            LOG.ERROR(e.getMessage());
         }
     }
 
@@ -53,9 +50,7 @@ public class VirtDescription extends VirtCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         if (VirtDescription.contains(hostname)) {
             //update
             String sql = "UPDATE virt_description " +
@@ -80,18 +75,18 @@ public class VirtDescription extends VirtCounterRecord {
             pstmt.setString(3, hostname);
 
             pstmt.executeUpdate();
+
+            conn.commit();
             synchronized (virt_list) {
                 virt_list.add(hostname);
             }
         }
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb() throws Exception {
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
+    static public void fromDb(List<HashMap> list)
+            throws Exception {
         String sql = "SELECT host_ip, hostname FROM virt_description;";
-        Statement stmt = conn.createStatement();
+        Statement stmt = DB.db_conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
 
         while (rs.next()) {
@@ -100,7 +95,5 @@ public class VirtDescription extends VirtCounterRecord {
             map.put("hostname", rs.getString("hostname"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

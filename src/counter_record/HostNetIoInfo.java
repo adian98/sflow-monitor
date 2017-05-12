@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -74,9 +74,7 @@ public class HostNetIoInfo extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO host_net_io " +
                 "(host_ip, timestamp, bytes_in, packets_in, errs_in, drops_in, " +
                 "bytes_out, packets_out, errs_out, drops_out) " +
@@ -93,18 +91,15 @@ public class HostNetIoInfo extends HostCounterRecord {
         pstmt.setLong(9, errs_out);
         pstmt.setLong(10, drops_out);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
-    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+    static public void fromDb(String host_ip, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
 
         String sql = "SELECT * FROM host_net_io WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
 
-        PreparedStatement pstmt = conn.prepareStatement(sql);
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
@@ -124,8 +119,6 @@ public class HostNetIoInfo extends HostCounterRecord {
             map.put("drops_out", rs.getLong("drops_out"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 
 

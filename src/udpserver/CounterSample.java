@@ -1,10 +1,12 @@
 package udpserver;
 
-import config.Config;
 import counter_record.HostDescription;
 import java.nio.ByteBuffer;
+import java.sql.Connection;
 import java.util.HashSet;
 import counter_record.*;
+import db.DB;
+import log.LOG;
 
 public class CounterSample implements SFlowSample {
     private static final int HOST_DESCRIPTION_TYPE = 0X0 | 2000;
@@ -44,7 +46,6 @@ public class CounterSample implements SFlowSample {
     @Override
     public void decode() throws Exception {
         int sequenceNumb = buffer.getInt();
-        //Config.LOG_INFO("sample sequence number = %d", sequenceNumb);
 
         if (is_expanded) {
             id_type = buffer.getInt();
@@ -55,8 +56,6 @@ public class CounterSample implements SFlowSample {
             id_index = id & 0x00ffffff;
         }
         records = buffer.getInt();
-
-        //Config.LOG_INFO("records = %d", records);
 
         for (int i = 0; i < records; ++i) {
             int type = buffer.getInt();
@@ -113,42 +112,37 @@ public class CounterSample implements SFlowSample {
                     /*skip*/
                     break;
                 default:
-                    Config.LOG_ERROR("not supported type %d", enterprise | format);
+                    LOG.ERROR("not supported type %d", enterprise | format);
                     break;
             }
         }
     }
 
     @Override
-    public void saveToDb() throws Exception {
+    public void saveToDb(Connection conn) throws Exception {
         if (description == null) {
             return;
         }
-
-
-
         if (!host_records.isEmpty() && virt_records.isEmpty()) {
             //host record
-            description.saveToDb();
-            //Config.LOG_INFO("only host info %S", source_ip);
+            description.saveToDb(conn);
             for (HostCounterRecord record : host_records) {
-                record.saveToDb();
+                record.saveToDb(conn);
             }
         } else if (!virt_records.isEmpty() && host_records.isEmpty()){
             //virt record
-            //Config.LOG_INFO("only virt info %s", source_ip);
             String host_name = description.getHostName();
             assert host_records.isEmpty();
             VirtDescription description = new VirtDescription(source_ip, timestamp, host_name);
-            description.saveToDb();
+            description.saveToDb(conn);
 
             for (VirtCounterRecord record : virt_records) {
                 record.setHostName(host_name);
-                record.saveToDb();
+                record.saveToDb(conn);
             }
         } else {
             //never happened
-            Config.LOG_ERROR("both host and virt info %s", source_ip);
+            LOG.ERROR("both host and virt info %s", source_ip);
         }
 
     }

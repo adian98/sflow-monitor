@@ -1,6 +1,6 @@
 package counter_record;
 
-import config.Config;
+import db.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -87,9 +87,7 @@ public class HostMemoryInfo extends HostCounterRecord {
     }
 
     @Override
-    public void saveToDb() throws Exception {
-        Connection conn = Config.getJdbcConnection();
-
+    public void saveToDb(Connection conn) throws Exception {
         String sql = "INSERT INTO host_memory " +
                 "(host_ip, timestamp, mem_total, mem_free, mem_shared, mem_buffers, " +
                 "mem_cached, swap_total, swap_free, page_in, page_out, swap_in, swap_out) " +
@@ -109,14 +107,13 @@ public class HostMemoryInfo extends HostCounterRecord {
         pstmt.setLong(12, swap_in);
         pstmt.setLong(13, swap_out);
         pstmt.executeUpdate();
-        Config.putJdbcConnection(conn);
     }
 
 
-    static public List<HashMap> fromDb(String host_ip, Long timestamp) throws Exception {
+    static public void fromDb(String host_ip, Long timestamp, List<HashMap> list)
+            throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-        List<HashMap> list = new ArrayList<HashMap>();
-        Connection conn = Config.getJdbcConnection();
+        Connection conn = DB.db_conn;
         String sql = "SELECT * FROM host_memory WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, host_ip);
@@ -141,7 +138,5 @@ public class HostMemoryInfo extends HostCounterRecord {
             map.put("swap_out", rs.getLong("swap_out"));
             list.add(map);
         }
-        Config.putJdbcConnection(conn);
-        return list;
     }
 }

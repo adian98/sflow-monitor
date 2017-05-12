@@ -3,12 +3,14 @@ package servlet.controller;
 
 import counter_record.Utils;
 import counter_record.VirtMemoryInfo;
+import db.DB;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import servlet.Error;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,7 +43,10 @@ public class VirtMemoryController extends AbstractController {
             timestamp = Utils.timeNow();
         }
 
-        List<HashMap> list = VirtMemoryInfo.fromDb(hostname, timestamp);
+        List<HashMap> list = new ArrayList<HashMap>();
+        synchronized (DB.db_lock) {
+            VirtMemoryInfo.fromDb(hostname, timestamp, list);
+        }
         JSONArray jsonArray = JSONArray.fromObject(list);
         return new Result(jsonArray.toString(2), id);
     }

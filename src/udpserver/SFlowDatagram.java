@@ -1,12 +1,12 @@
 package udpserver;
 
-import config.Config;
+import db.DB;
+import log.LOG;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-
-
+import java.util.ArrayList;
 
 public class SFlowDatagram {
     static private final int FLOW_SAMPLE_TYPE = 0x0 | 0x1; //enterprise = 0, format = 1 Flow Sample
@@ -23,6 +23,8 @@ public class SFlowDatagram {
     private String agent_address;
     private int samples;
 
+    private ArrayList<SFlowSample> samples_list;
+
 
     public SFlowDatagram(ByteBuffer buffer, InetAddress socketAddress) {
         is_v4 = socketAddress instanceof Inet4Address;
@@ -30,18 +32,16 @@ public class SFlowDatagram {
         size = buffer.remaining();
         source_ip = socketAddress.getHostAddress();
         timestamp = System.currentTimeMillis();
+        samples_list = new ArrayList<SFlowSample>();
     }
 
 
-    public void process() throws Exception {
-        //Config.LOG_INFO("startdatagram ===========================");
-        //Config.LOG_INFO("source ip = %s size = %d", sourceIP, size);
-
+    public void decode() throws Exception {
         //java use network endian
         version = buffer.getInt();
 
         if (version != 5) {
-            Config.LOG_ERROR("not supported sflow version %d", version);
+            LOG.ERROR("not supported sflow version %d", version);
             return;
         }
 
@@ -56,16 +56,9 @@ public class SFlowDatagram {
         //switch uptime in ms, ignore
         buffer.getInt();
 
-        //Config.LOG_INFO("uptime = %s", timestamp);
-
         samples = buffer.getInt();
 
-        //Config.LOG_INFO("samples = %d", samples);
-
         decode_samples();
-
-        //Config.LOG_INFO("enddatagram ===========================");
-
     }
 
 
@@ -86,18 +79,15 @@ public class SFlowDatagram {
             }
 
             default:
-                Config.LOG_ERROR("unknown IP version of the Agent %d", v);
+                LOG.ERROR("unknown IP version of the Agent %d", v);
                 throw new Exception("invalid datagram");
         }
 
         agent_address = InetAddress.getByAddress(bytes).getHostAddress();
-        //Config.LOG_INFO("agent ip = %s", agent_address);
-
     }
 
 
-    private void decode_samples() throws Exception {
-        //Config.LOG_INFO("------------start sample---------------");
+    private void decode_samples() {
         for (int i = 0; i < samples; ++i) {
 
             int sampleType = buffer.getInt();
@@ -120,22 +110,30 @@ public class SFlowDatagram {
                     /*skip*/
                     break;
                 default: {
-                    Config.LOG_ERROR("unknown type %d", sampleType);
+                    LOG.ERROR("unknown type %d", sampleType);
                 }
             }
             if (sample != null) {
                 try {
                     sample.decode();
-                    sample.saveToDb();
+                    samples_list.add(sample);
                 } catch (Exception e) {
-                    Config.LOG_ERROR("process error :" + e.getMessage());
+                    LOG.ERROR("sample decode error :" + e.getMessage());
                     e.printStackTrace();
                     continue;
                 }
-
             }
         }
+    }
 
+    public void saveToDb() throws Exception {
+        synchronized (DB.db_lock) {
+            //lock the db
+            for (SFlowSample sample : samples_list) {
+                sample.saveToDb(DB.db_conn);
+            }
+            DB.db_conn.commit();
+        }
     }
 
 }
