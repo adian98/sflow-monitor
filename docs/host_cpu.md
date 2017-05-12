@@ -12,7 +12,7 @@ host.cpu
 |Parameter|Required|  Type  |                             Description                                      |
 |---------|--------|--------|------------------------------------------------------------------------------|
 |ip       |true    |string  |节点IP|
-|timestamp|false   |long    |UNIX 时间戳(milliseconds), 返回该时间戳及10分钟之前的所有信息，如果不指定默认为当前时间|
+|timestamp|false   |long    |UNIX 时间戳(milliseconds), 返回该时间戳及10分钟之前的所有信息，如果不指定返回当前时间及10分钟之前的所有信息|
 
 #### Return values
 
@@ -21,7 +21,7 @@ array:
 |     Key        | Type |                                             Description                                 |
 |----------------|------|-----------------------------------------------------------------------------------------|
 |host_ip         |string|ip|
-|timestamp       |long  |timestamp|
+|timestamp       |long  |timestamp (milliseconds)|
 |cpu_load_one    |float |1 minute load avg., -1.0 = unknown|
 |cpu_load_five   |float |5 minute load avg., -1.0 = unknown|
 |cpu_load_fifteen|float |1 minute load avg., -1.0 = unknown|

@@ -1,9 +1,9 @@
-host.disk
+host.net
 ----------------
 
 #### Description
 
-返回物理节点的硬盘 I/O 信息
+返回物理节点的网络 I/O 信息
 
 #### Parameters
 
@@ -20,15 +20,14 @@ array:
 |----------------|------|-----------------------------------------------------------------------------------------|
 |host_ip         |string|ip|
 |timestamp       |long  |timestamp (milliseconds)|
-|disk_total      |long  |total disk size in bytes|
-|disk_free       |long  |total disk free in bytes|
-|part_max_used   |float |utilization of most utilized partition|
-|reads           |long  |reads issued|
-|bytes_read      |long  |bytes read|
-|read_time       |long  |read time (ms)|
-|writes          |long  |writes completed|
-|bytes_written   |long  |bytes written|
-|write_time      |long  |write time (ms)|
+|bytes_in        |long  |total bytes in |
+|packets_in      |long  |total packets in|
+|errs_in         |long  |total errors in|
+|drops_in        |long  |total drops in|
+|bytes_out       |long  |total bytes out|
+|packets_out     |long  |total packets out|
+|errs_out        |long  |total errors out|
+|drops_out       |long  |total drops out|
 
 #### Examples
 
@@ -36,7 +35,7 @@ Request:
 
     {
       "jsonrpc": "2.0",
-      "method": "host.disk", 
+      "method": "host.net", 
       "params": {"ip": "10.12.25.25", 
                  "timestamp": 1494498014465
       },
@@ -51,30 +50,28 @@ Response:
         {
         "host_ip": "10.12.25.25",
         "timestamp": 1494497436718,
-        "disk_total": 7886442244096,
-        "disk_free": 5492770930688,
-        "part_max_used": 49.75,
-        "reads": 12761694,
-        "bytes_read": 966276791296,
-        "read_time": 60031297,
-        "writes": 95505528,
-        "bytes_written": 2335413551104,
-        "write_time": 529538150
+        "bytes_in": 496120640946,
+        "packets_in": 583606453,
+        "errs_in": 0,
+        "drops_in": 0,
+        "bytes_out": 453856636220,
+        "packets_out": 528791881,
+        "errs_out": 0,
+        "drops_out": 2575312
       },
         {
         "host_ip": "10.12.25.25",
         "timestamp": 1494497472579,
-        "disk_total": 7886442244096,
-        "disk_free": 5492770824192,
-        "part_max_used": 49.75,
-        "reads": 12761879,
-        "bytes_read": 966277749760,
-        "read_time": 60031432,
-        "writes": 95509425,
-        "bytes_written": 2335453519872,
-        "write_time": 529543107
+        "bytes_in": 496122389387,
+        "packets_in": 583624676,
+        "errs_in": 0,
+        "drops_in": 0,
+        "bytes_out": 453868221066,
+        "packets_out": 528821433,
+        "errs_out": 0,
+        "drops_out": 2575833
       },
-      ....
+      ...
     ],
       "id": "4a157505-a201-4b94-aa6c-39c77d65dbd1"
     }

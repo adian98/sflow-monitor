@@ -1,9 +1,9 @@
-host.disk
+host.memory
 ----------------
 
 #### Description
 
-返回物理节点的硬盘 I/O 信息
+返回物理节点的内存信息
 
 #### Parameters
 
@@ -20,15 +20,17 @@ array:
 |----------------|------|-----------------------------------------------------------------------------------------|
 |host_ip         |string|ip|
 |timestamp       |long  |timestamp (milliseconds)|
-|disk_total      |long  |total disk size in bytes|
-|disk_free       |long  |total disk free in bytes|
-|part_max_used   |float |utilization of most utilized partition|
-|reads           |long  |reads issued|
-|bytes_read      |long  |bytes read|
-|read_time       |long  |read time (ms)|
-|writes          |long  |writes completed|
-|bytes_written   |long  |bytes written|
-|write_time      |long  |write time (ms)|
+|mem_total       |long  |total bytes |
+|mem_free        |long  |free bytes|
+|mem_shared      |long  |shared bytes|
+|mem_buffers     |long  |buffers bytes|
+|mem_cached      |long  |cached bytes|
+|swap_total      |long  |swap total bytes|
+|swap_free       |long  |swap free bytes|
+|page_in         |long  |page in count|
+|page_out        |long  |page out count|
+|swap_in         |long  |swap in count|
+|swap_out        |long  |swap out count|
 
 #### Examples
 
@@ -36,7 +38,7 @@ Request:
 
     {
       "jsonrpc": "2.0",
-      "method": "host.disk", 
+      "method": "host.memory", 
       "params": {"ip": "10.12.25.25", 
                  "timestamp": 1494498014465
       },
@@ -51,30 +53,34 @@ Response:
         {
         "host_ip": "10.12.25.25",
         "timestamp": 1494497436718,
-        "disk_total": 7886442244096,
-        "disk_free": 5492770930688,
-        "part_max_used": 49.75,
-        "reads": 12761694,
-        "bytes_read": 966276791296,
-        "read_time": 60031297,
-        "writes": 95505528,
-        "bytes_written": 2335413551104,
-        "write_time": 529538150
+        "mem_total": 134994153472,
+        "mem_free": 454225920,
+        "mem_shared": 0,
+        "mem_buffers": 321040384,
+        "mem_cached": 98214662144,
+        "swap_total": 34359734272,
+        "swap_free": 33039101952,
+        "page_in": 832694718,
+        "page_out": 2026008742,
+        "swap_in": 891790,
+        "swap_out": 1724544
       },
         {
         "host_ip": "10.12.25.25",
         "timestamp": 1494497472579,
-        "disk_total": 7886442244096,
-        "disk_free": 5492770824192,
-        "part_max_used": 49.75,
-        "reads": 12761879,
-        "bytes_read": 966277749760,
-        "read_time": 60031432,
-        "writes": 95509425,
-        "bytes_written": 2335453519872,
-        "write_time": 529543107
+        "mem_total": 134994153472,
+        "mem_free": 455331840,
+        "mem_shared": 0,
+        "mem_buffers": 321093632,
+        "mem_cached": 98215223296,
+        "swap_total": 34359734272,
+        "swap_free": 33039159296,
+        "page_in": 832695338,
+        "page_out": 2026044182,
+        "swap_in": 891806,
+        "swap_out": 1724544
       },
-      ....
+      ...
     ],
       "id": "4a157505-a201-4b94-aa6c-39c77d65dbd1"
     }

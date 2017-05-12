@@ -1,7 +1,6 @@
 host.description
 ----------------
 
-
 #### Description
 
 This method allows to retrieve the physical host descriptions

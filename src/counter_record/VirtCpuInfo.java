@@ -49,7 +49,7 @@ public class VirtCpuInfo extends VirtCounterRecord {
                 "hostname TEXT, " +
                 "vcpu_state INTEGER, " +
                 "vcpu_cpu_time INTEGER, "  +
-                "vcpu_cpu_count READ, " +
+                "vcpu_cpu_count INTEGER, " +
                 "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip));";
     }
 
