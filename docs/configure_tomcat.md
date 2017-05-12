@@ -21,8 +21,8 @@ configure tomcat
  
  注意 ： 
  
- * 编译的 JDK 版本最好他服务器的一致, 统一用 openjdk 1.8.x
- * 包一次测试脚本，让 tomcat 把 jsp 编译一遍
+ * 编译的 JDK 版本最好和服务器的一致, 统一用 openjdk 1.8.x
+ * 运行一次测试脚本，让 tomcat 把 jsp 编译一遍
       
       cd sflow-monitor/test
       python3 run_all.py
