@@ -2,10 +2,15 @@ host-sflow install
 ------------------
 
 git clone git@github.com:sflow/host-sflow.git
+
 cd host-sflow
+
 make FEATURES="HOST KVM OVS"
+
 sudo make install
+
 sudo vim /etc/hsflowd.conf
+
    
     sflow {
            polling = 30
@@ -15,7 +20,9 @@ sudo vim /etc/hsflowd.conf
     }
      
 sudo systemctl enable hsflowd.service
+
 sudo systemctl restart hsflowd.service
+
 sudo systemctl status hsflowd.service
 
 
