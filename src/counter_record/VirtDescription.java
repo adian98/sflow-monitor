@@ -25,7 +25,7 @@ public class VirtDescription extends VirtCounterRecord {
         return "CREATE TABLE IF NOT EXISTS virt_description (" +
                 "host_id INTEGER, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT ;";
+                "hostname TEXT) ;";
     }
 
     static public void loadFromDb(Connection conn) {
