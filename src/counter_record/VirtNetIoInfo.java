@@ -105,7 +105,6 @@ public class VirtNetIoInfo extends VirtCounterRecord {
     static public void fromDb(String hostname, Long timestamp, List<HashMap> list)
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
-
         Long virt_id = VirtDescription.getVirtId(hostname);
 
         String sql = "SELECT * FROM virt_net_io WHERE virt_id = ? AND ? < timestamp AND timestamp <= ?;";
