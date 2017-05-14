@@ -49,24 +49,25 @@ public class HostNodeInfo extends HostCounterRecord {
     }
 
     public static String schema() {
-        return "CREATE TABLE host_node (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS host_node (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
                 "vnode_mhz INTEGER, " +
                 "vnode_cpus INTEGER, " +
                 "vnode_memory INTEGER, " +
                 "vnode_memory_free INTEGER, " +
                 "vnode_num_domains INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid) );";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
         String sql = "INSERT INTO host_node " +
-                "(host_ip, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
+                "(host_id, timestamp, vnode_mhz, vnode_cpus, vnode_memory, vnode_memory_free, vnode_num_domains)" +
                 "VALUES(?,?,?,?,?,?,?);";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
         pstmt.setLong(3,  vnode_mhz);
         pstmt.setLong(4, vnode_cpus);
@@ -79,17 +80,18 @@ public class HostNodeInfo extends HostCounterRecord {
     static public void fromDb(String host_ip, Long timestamp, List<HashMap> list) throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM host_node WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        Long host_id = HostDescription.getHostId(host_ip);
+        String sql = "SELECT * FROM host_node WHERE host_id = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            map.put("host_ip", host_ip);
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("vnode_mhz", rs.getLong("vnode_mhz"));
             map.put("vnode_cpus", rs.getLong("vnode_cpus"));

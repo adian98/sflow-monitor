@@ -69,8 +69,8 @@ public class HostMemoryInfo extends HostCounterRecord {
     }
 
     static public String schema() {
-        return "CREATE TABLE host_memory (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS host_memory (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
                 "mem_total INTEGER, " +
                 "mem_free INTEGER, " +
@@ -83,17 +83,18 @@ public class HostMemoryInfo extends HostCounterRecord {
                 "page_out INTEGER, " +
                 "swap_in INTEGER, " +
                 "swap_out INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid) );";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
         String sql = "INSERT INTO host_memory " +
-                "(host_ip, timestamp, mem_total, mem_free, mem_shared, mem_buffers, " +
+                "(host_id, timestamp, mem_total, mem_free, mem_shared, mem_buffers, " +
                 "mem_cached, swap_total, swap_free, page_in, page_out, swap_in, swap_out) " +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
         pstmt.setLong(3, mem_total);
         pstmt.setLong(4, mem_free);
@@ -112,18 +113,19 @@ public class HostMemoryInfo extends HostCounterRecord {
 
     static public void fromDb(String host_ip, Long timestamp, List<HashMap> list)
             throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
+
         Long start = timestamp - Utils.tenMinutes();
-        Connection conn = DB.db_conn;
-        String sql = "SELECT * FROM host_memory WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        String sql = "SELECT * FROM host_memory WHERE host_id = ? AND ? < timestamp AND timestamp <= ?;";
+        PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            map.put("host_ip", host_ip);
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("mem_total", rs.getLong("mem_total"));
             map.put("mem_free", rs.getLong("mem_free"));

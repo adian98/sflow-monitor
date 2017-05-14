@@ -60,10 +60,10 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
     }
 
     public static String schema() {
-        return "CREATE TABLE virt_disk_io (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS virt_disk_io (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT, " +
+                "virt_id INTEGER, " +
                 "vdsk_capacity INTEGER, " +
                 "vdsk_allocation INTEGER, " +
                 "vdsk_available INTEGER, " +
@@ -72,20 +72,23 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
                 "vdsk_wr_req INTEGER, " +
                 "vdsk_wr_bytes INTEGER, " +
                 "vdsk_errs INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid), " +
+                "FOREIGN KEY(virt_id) REFERENCES virt_description(rowid));";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
+        Long virt_id = VirtDescription.getVirtId(hostname);
 
         String sql = "INSERT INTO virt_disk_io " +
-                "(host_ip, timestamp, hostname, vdsk_capacity, vdsk_allocation, vdsk_available," +
+                "(host_id, timestamp, virt_id, vdsk_capacity, vdsk_allocation, vdsk_available," +
                 "vdsk_rd_req, vdsk_rd_bytes, vdsk_wr_req, vdsk_wr_bytes, vdsk_errs)" +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?);";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
-        pstmt.setString(3, hostname);
+        pstmt.setLong(3, virt_id);
         pstmt.setLong(4, vdsk_capacity);
         pstmt.setLong(5, vdsk_allocation);
         pstmt.setLong(6, vdsk_available);
@@ -101,19 +104,22 @@ public class VirtDiskIoInfo extends VirtCounterRecord {
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM virt_disk_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+        Long virt_id = VirtDescription.getVirtId(hostname);
+
+        String sql = "SELECT * FROM virt_disk_io WHERE virt_id = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, hostname);
+        pstmt.setLong(1, virt_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            Long host_id = rs.getLong("host_id");
+            map.put("host_ip", HostDescription.getHostIp(host_id));
             map.put("timestamp", rs.getLong("timestamp"));
-            map.put("hostname", rs.getString("hostname"));
+            map.put("hostname", hostname);
             map.put("vdsk_capacity", rs.getLong("vdsk_capacity"));
             map.put("vdsk_allocation", rs.getLong("vdsk_allocation"));
             map.put("vdsk_available", rs.getLong("vdsk_available"));

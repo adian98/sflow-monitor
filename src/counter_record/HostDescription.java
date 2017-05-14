@@ -13,7 +13,9 @@ public class HostDescription extends HostCounterRecord {
     private String os_name;      /* Operating system */
     private String os_release;   /* e.g. 2.6.9-42.ELsmp,xp-sp3, empty if unknown */
 
-    static private HashSet<String> nodeList;
+    static private HashMap<String, Long> host_map;
+    static private HashMap<Long, String> id_to_host_map;
+    static private Long row_id;
 
     private HostDescription(byte[] bytes, String host_ip, long timestamp) {
         super(bytes, host_ip, timestamp);
@@ -169,7 +171,8 @@ public class HostDescription extends HostCounterRecord {
     }
 
     static public String schema() {
-        return "CREATE TABLE host_description (" +
+        //use rowid as host_id
+        return "CREATE TABLE IF NOT EXISTS host_description (" +
                 "host_ip TEXT NOT NULL, " +
                 "timestamp INTEGER, " +
                 "hostname TEXT, " +
@@ -180,14 +183,21 @@ public class HostDescription extends HostCounterRecord {
     }
 
     static public void loadFromDb(Connection conn) {
-        nodeList = new HashSet<String>();
+        //init
+        row_id = 1L;
+        host_map = new HashMap<String, Long>();
+        id_to_host_map = new HashMap<Long, String>();
+
         try {
             Statement stmt = conn.createStatement();
-            String sql = "SELECT host_ip FROM host_description";
+            String sql = "SELECT rowid, host_ip FROM host_description";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                nodeList.add(rs.getString("host_ip"));
+                Long rowid = rs.getLong("rowid");
+                String host_ip = rs.getString("host_ip");
+                host_map.put(host_ip, rowid);
+                id_to_host_map.put(rowid, host_ip);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,13 +205,32 @@ public class HostDescription extends HostCounterRecord {
         }
     }
 
-    static public synchronized boolean contains(String host) {
-        return nodeList.contains(host);
+    static public boolean contains(String host) {
+        synchronized (host_map) {
+            return host_map.containsKey(host);
+        }
+    }
+
+    static public Long getHostId(String host) {
+        synchronized (host_map) {
+            Long ret = host_map.get(host);
+            return ret != null ? ret : -1;
+        }
+    }
+
+    static public String getHostIp(Long host_id) {
+        synchronized (id_to_host_map) {
+            String ret = id_to_host_map.get(host_id);
+            return ret != null ? ret : "unknown";
+        }
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
         if (HostDescription.contains(host_ip)) {
+
+            Long id = getHostId(host_ip);
+
             String sql = "UPDATE host_description " +
                     "SET timestamp = ?, " +
                     "hostname = ?, " +
@@ -209,7 +238,7 @@ public class HostDescription extends HostCounterRecord {
                     "machine_type = ?, " +
                     "os_name = ?, " +
                     "os_release = ? " +
-                    "WHERE host_ip = ?;";
+                    "WHERE rowid = ?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
 
             pstmt.setLong(1, timestamp);
@@ -218,7 +247,7 @@ public class HostDescription extends HostCounterRecord {
             pstmt.setString(4, machine_type);
             pstmt.setString(5, os_name);
             pstmt.setString(6, os_release);
-            pstmt.setString(7, host_ip);
+            pstmt.setLong(7, id);
             pstmt.executeUpdate();
 
         } else {
@@ -238,8 +267,9 @@ public class HostDescription extends HostCounterRecord {
             pstmt.executeUpdate();
 
             conn.commit();
-            synchronized (nodeList) {
-                nodeList.add(host_ip);
+            synchronized (host_ip) {
+                host_map.put(host_ip, row_id);
+                ++row_id;
             }
         }
     }
@@ -259,6 +289,5 @@ public class HostDescription extends HostCounterRecord {
             list.add(map);
         }
     }
-
 
 }

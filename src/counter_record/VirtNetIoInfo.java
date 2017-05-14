@@ -62,10 +62,10 @@ public class VirtNetIoInfo extends VirtCounterRecord {
     }
 
     public static String schema() {
-        return "CREATE TABLE virt_net_io (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS virt_net_io (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT, " +
+                "virt_id INTEGER, " +
                 "vnio_bytes_in INTEGER, " +
                 "vnio_packets_in INTEGER, " +
                 "vnio_errs_in INTEGER, " +
@@ -74,19 +74,23 @@ public class VirtNetIoInfo extends VirtCounterRecord {
                 "vnio_packets_out INTEGER, " +
                 "vnio_errs_out INTEGER, " +
                 "vnio_drops_out INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid), " +
+                "FOREIGN KEY(virt_id) REFERENCES virt_description(rowid));";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
+        Long virt_id = VirtDescription.getVirtId(hostname);
+
         String sql = "INSERT INTO virt_net_io " +
-                "(host_ip, timestamp, hostname, vnio_bytes_in, vnio_packets_in, vnio_errs_in, vnio_drops_in, " +
+                "(host_id, timestamp, virt_id, vnio_bytes_in, vnio_packets_in, vnio_errs_in, vnio_drops_in, " +
                 "vnio_bytes_out, vnio_packets_out, vnio_errs_out, vnio_drops_out)" +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?);";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
-        pstmt.setString(3, hostname);
+        pstmt.setLong(3, virt_id);
         pstmt.setLong(4, vnio_bytes_in);
         pstmt.setLong(5, vnio_packets_in);
         pstmt.setLong(6, vnio_errs_in);
@@ -102,19 +106,22 @@ public class VirtNetIoInfo extends VirtCounterRecord {
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM virt_net_io WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+        Long virt_id = VirtDescription.getVirtId(hostname);
+
+        String sql = "SELECT * FROM virt_net_io WHERE virt_id = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, hostname);
+        pstmt.setLong(1, virt_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            Long host_id = rs.getLong("host_id");
+            map.put("host_ip", HostDescription.getHostIp(host_id));
             map.put("timestamp", rs.getLong("timestamp"));
-            map.put("hostname", rs.getString("hostname"));
+            map.put("hostname", hostname);
             map.put("vnio_bytes_in", rs.getLong("vnio_bytes_in"));
             map.put("vnio_packets_in", rs.getLong("vnio_packets_in"));
             map.put("vnio_errs_in", rs.getLong("vnio_errs_in"));

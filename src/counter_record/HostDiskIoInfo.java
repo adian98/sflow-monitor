@@ -62,8 +62,8 @@ public class HostDiskIoInfo extends HostCounterRecord {
     }
 
     static public String schema() {
-        return "CREATE TABLE host_disk_io (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS host_disk_io (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
                 "disk_total INTEGER, " +
                 "disk_free INTEGER, "  +
@@ -74,18 +74,18 @@ public class HostDiskIoInfo extends HostCounterRecord {
                 "writes INTEGER, "  +
                 "bytes_written INTEGER, "  +
                 "write_time INTEGER, "  +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid) );";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
-
+        Long host_id = HostDescription.getHostId(host_ip);
         String sql = "INSERT INTO host_disk_io " +
-                "(host_ip, timestamp, disk_total, disk_free, part_max_used, " +
+                "(host_id, timestamp, disk_total, disk_free, part_max_used, " +
                 "reads, bytes_read, read_time, writes, bytes_written, write_time) " +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
         pstmt.setLong(3, disk_total);
         pstmt.setLong(4, disk_free);
@@ -103,16 +103,18 @@ public class HostDiskIoInfo extends HostCounterRecord {
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM host_disk_io WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        Long host_id = HostDescription.getHostId(host_ip);
+
+        String sql = "SELECT * FROM host_disk_io WHERE host_id = ? AND ? < timestamp AND timestamp <= ?;";
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            map.put("host_ip", host_ip);
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("disk_total", rs.getLong("disk_total"));
             map.put("disk_free", rs.getLong("disk_free"));

@@ -87,8 +87,8 @@ public class HostCpuInfo extends HostCounterRecord {
     }
 
     static public String schema() {
-        return "CREATE TABLE host_cpu (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS host_cpu (" +
+                "host_id INTEGER NOT NULL, " +
                 "timestamp INTEGER, " +
                 "cpu_load_one REAL, " +
                 "cpu_load_five REAL, " +
@@ -107,18 +107,19 @@ public class HostCpuInfo extends HostCounterRecord {
                 "cpu_sintr INTEGER, " +
                 "cpu_interrupts INTEGER, " +
                 "cpu_contexts INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid) );";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
         String sql = "INSERT INTO host_cpu " +
-                "(host_ip, timestamp, cpu_load_one, cpu_load_five, cpu_load_fifteen, cpu_proc_run, " +
+                "(host_id, timestamp, cpu_load_one, cpu_load_five, cpu_load_fifteen, cpu_proc_run, " +
                 "cpu_proc_total, cpu_num, cpu_speed, cpu_uptime, cpu_user, cpu_nice, cpu_system, cpu_idle, " +
                 "cpu_waiting_io, cpu_intr, cpu_sintr, cpu_interrupts, cpu_contexts) " +
                 "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
         pstmt.setFloat(3, cpu_load_one);
         pstmt.setFloat(4, cpu_load_five);
@@ -144,17 +145,19 @@ public class HostCpuInfo extends HostCounterRecord {
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM host_cpu WHERE host_ip = ? AND ? < timestamp AND timestamp <= ?;";
+        Long host_id = HostDescription.getHostId(host_ip);
+
+        String sql = "SELECT * FROM host_cpu WHERE host_id = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            map.put("host_ip", host_ip);
             map.put("timestamp", rs.getLong("timestamp"));
             map.put("cpu_load_one", rs.getFloat("cpu_load_one"));
             map.put("cpu_load_five", rs.getFloat("cpu_load_five"));

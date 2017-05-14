@@ -41,24 +41,28 @@ public class VirtMemoryInfo extends VirtCounterRecord {
     }
 
     public static String schema() {
-        return "CREATE TABLE virt_memory (" +
-                "host_ip TEXT NOT NULL, " +
+        return "CREATE TABLE IF NOT EXISTS virt_memory (" +
+                "host_id INTEGER, " +
                 "timestamp INTEGER, " +
-                "hostname TEXT, " +
+                "virt_id INTEGER, " +
                 "vmem_memory INTEGER, " +
                 "vmem_max_memory INTEGER, " +
-                "FOREIGN KEY(host_ip) REFERENCES host_description(host_ip) );";
+                "FOREIGN KEY(host_id) REFERENCES host_description(rowid), " +
+                "FOREIGN KEY(virt_id) REFERENCES virt_description(rowid));";
     }
 
     @Override
     public void saveToDb(Connection conn) throws Exception {
+        Long host_id = HostDescription.getHostId(host_ip);
+        Long virt_id = VirtDescription.getVirtId(hostname);
+
         String sql = "INSERT INTO virt_memory " +
-                "(host_ip, timestamp, hostname, vmem_memory, vmem_max_memory)" +
+                "(host_id, timestamp, virt_id, vmem_memory, vmem_max_memory)" +
                 "VALUES(?,?,?,?,?);";
         PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, host_ip);
+        pstmt.setLong(1, host_id);
         pstmt.setLong(2, timestamp);
-        pstmt.setString(3, hostname);
+        pstmt.setLong(3, virt_id);
         pstmt.setLong(4, vmem_memory);
         pstmt.setLong(5, vmem_max_memory);
         pstmt.executeUpdate();
@@ -68,19 +72,22 @@ public class VirtMemoryInfo extends VirtCounterRecord {
             throws Exception {
         Long start = timestamp - Utils.tenMinutes();
 
-        String sql = "SELECT * FROM virt_memory WHERE hostname = ? AND ? < timestamp AND timestamp <= ?;";
+        Long virt_id = VirtDescription.getVirtId(hostname);
+
+        String sql = "SELECT * FROM virt_memory WHERE virt_id = ? AND ? < timestamp AND timestamp <= ?;";
 
         PreparedStatement pstmt = DB.db_conn.prepareStatement(sql);
-        pstmt.setString(1, hostname);
+        pstmt.setLong(1, virt_id);
         pstmt.setLong(2, start);
         pstmt.setLong(3, timestamp);
         ResultSet rs = pstmt.executeQuery();
 
         while (rs.next()) {
             HashMap<String, Object> map = new LinkedHashMap<String, Object>();
-            map.put("host_ip", rs.getString("host_ip"));
+            Long host_id = rs.getLong("host_id");
+            map.put("host_ip", HostDescription.getHostIp(host_id));
             map.put("timestamp", rs.getLong("timestamp"));
-            map.put("hostname", rs.getString("hostname"));
+            map.put("hostname", hostname);
             map.put("vmem_memory", rs.getLong("vmem_memory"));
             map.put("vmem_max_memory", rs.getLong("vmem_max_memory"));
             list.add(map);
