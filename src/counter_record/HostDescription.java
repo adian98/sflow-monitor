@@ -15,7 +15,6 @@ public class HostDescription extends HostCounterRecord {
 
     static private HashMap<String, Long> host_map;
     static private HashMap<Long, String> id_to_host_map;
-    static private Long row_id;
 
     private HostDescription(byte[] bytes, String host_ip, long timestamp) {
         super(bytes, host_ip, timestamp);
@@ -184,13 +183,12 @@ public class HostDescription extends HostCounterRecord {
 
     static public void loadFromDb(Connection conn) {
         //init
-        row_id = 1L;
         host_map = new HashMap<String, Long>();
         id_to_host_map = new HashMap<Long, String>();
 
         try {
             Statement stmt = conn.createStatement();
-            String sql = "SELECT rowid, host_ip FROM host_description";
+            String sql = "SELECT rowid, host_ip FROM host_description;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -267,9 +265,18 @@ public class HostDescription extends HostCounterRecord {
             pstmt.executeUpdate();
 
             conn.commit();
-            synchronized (host_ip) {
-                host_map.put(host_ip, row_id);
-                ++row_id;
+
+            sql = "SELECT rowid FROM host_description WHERE host_ip = ?;";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, host_ip);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            Long host_id = rs.getLong("rowid");
+            synchronized (host_map) {
+                host_map.put(host_ip, host_id);
+            }
+            synchronized (id_to_host_map) {
+                id_to_host_map.put(host_id , host_ip);
             }
         }
     }

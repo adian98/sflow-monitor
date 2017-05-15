@@ -131,6 +131,12 @@ public class CounterSample implements SFlowSample {
             }
         } else if (!virt_records.isEmpty() && host_records.isEmpty()){
             //virt record
+            if (!HostDescription.contains(source_ip)) {
+                //skip this item
+                //因为virt_*的表有 host_description 中的 host_id 这项， 而且virt record 有可能比 host record 先到达
+                //所以在该 host record 到达前，先忽略
+                return;
+            }
             String host_name = description.getHostName();
             assert host_records.isEmpty();
             VirtDescription description = new VirtDescription(source_ip, timestamp, host_name);

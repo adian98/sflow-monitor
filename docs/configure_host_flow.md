@@ -5,7 +5,7 @@ git clone git@github.com:sflow/host-sflow.git
 
 cd host-sflow
 
-make FEATURES="HOST KVM OVS"
+make FEATURES="HOST KVM OVS PCAP"
 
 sudo make install
 

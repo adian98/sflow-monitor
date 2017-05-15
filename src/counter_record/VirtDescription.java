@@ -12,7 +12,6 @@ import java.util.List;
 
 public class VirtDescription extends VirtCounterRecord {
     static private HashMap<String, Long> virt_map;
-    static private Long row_id;
 
     public VirtDescription(String host_ip, long timestamp, String host_name) {
         //fix me : remove new byte[1]
@@ -31,8 +30,6 @@ public class VirtDescription extends VirtCounterRecord {
     static public void loadFromDb(Connection conn) {
         //init
         virt_map = new HashMap<String, Long>();
-        row_id = 1L;
-
         try {
             String sql = "SELECT rowid, hostname FROM virt_description";
             Statement stmt = conn.createStatement();
@@ -83,19 +80,25 @@ public class VirtDescription extends VirtCounterRecord {
         } else {
             //do save
             String sql = "INSERT INTO virt_description " +
-                    "(host_id, timestamp, rowid) " +
+                    "(host_id, timestamp, hostname) " +
                     "VALUES(?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, host_id);
             pstmt.setLong(2, timestamp);
-            pstmt.setLong(3, row_id);
-
+            pstmt.setString(3, hostname);
             pstmt.executeUpdate();
 
             conn.commit();
+
+            sql = "SELECT rowid FROM virt_description WHERE hostname = ?;";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, hostname);
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            Long virt_id = rs.getLong("rowid");
+
             synchronized (virt_map) {
-                virt_map.put(hostname, row_id);
-                ++row_id;
+                virt_map.put(hostname, virt_id);
             }
         }
     }
@@ -103,14 +106,13 @@ public class VirtDescription extends VirtCounterRecord {
     static public void fromDb(List<HashMap> list)
             throws Exception {
 
-        String sql = "SELECT host_id, rowid FROM virt_description;";
+        String sql = "SELECT host_id, hostname FROM virt_description;";
         Statement stmt = DB.db_conn.createStatement();
         ResultSet rs = stmt.executeQuery(sql);
 
         while (rs.next()) {
             HashMap<String, String> map = new HashMap<String, String>();
             Long host_id = rs.getLong("host_id");
-            Long virt_id = rs.getLong("rowid");
 
             map.put("host_ip", HostDescription.getHostIp(host_id));
             map.put("hostname", rs.getString("hostname"));
