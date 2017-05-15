@@ -113,6 +113,13 @@ This is obviously taken from a console session:
       "id": "34bf7218-d5ba-4b60-b4f3-31dd3071c534"
     }
     
+complie and deployment
+----------------------
+
+在主服务器编译运行 sflow-monitor， 启动 tomcat, [configure tomcat](/docs/configure_tomcat.md)
+
+在每个物理节点安装 host-sflow, 配置指向主服务器, [configure host-flow](docs/configure_host_flow.md)
+    
     
 
 
