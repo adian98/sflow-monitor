@@ -1,4 +1,4 @@
-slow-monitor
+sflow-monitor
 ============
 
 
